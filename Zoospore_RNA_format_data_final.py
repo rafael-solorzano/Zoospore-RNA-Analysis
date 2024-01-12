@@ -3,7 +3,7 @@ Zoospore RNA Manuscript: RNA Data Analysis for Specific Annotations, Step 2
 
 @author: Lazarina Butkovich
 """
-
+import os
 from os.path import join as pjoin
 import pandas as pd
 
@@ -94,8 +94,12 @@ def add_to_df(df, X_annot_pd, annot_cols_list, shared_col='proteinID'):
 Import Files and Make Annotation Dataframes
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # Import files
-input_folder = r'C:\Users\lazab\Desktop\python_scripts\workspace\Zoospore_RNA_final' 
-output_folder = r'C:\Users\lazab\Desktop\python_scripts\workspace_output\Zoospore_RNA_final'
+input_folder = r'input' 
+output_folder = r'output'
+
+# Create output folder if it doesn't exist
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
 
 # A) Essential file:
 # DGE summary from 1st script 

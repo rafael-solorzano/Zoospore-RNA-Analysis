@@ -3,6 +3,7 @@ Zoospore RNA Manuscript: RNA Data Analysis, Step 1
 
 @author: Lazarina Butkovich
 """
+import os
 from os.path import join as pjoin
 import pandas as pd
 import numpy as np
@@ -510,8 +511,8 @@ def return_class_stats(df, col, keyword, zoosp_upreg_col="zoosp_upreg",mat_upreg
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Changeable values    **************************************
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-input_folder = r'C:\Users\lazab\Desktop\python_scripts\workspace\Zoospore_RNA_final' 
-output_folder = r'C:\Users\lazab\Desktop\python_scripts\workspace_output\Zoospore_RNA_final'
+input_folder = r'input' 
+output_folder = r'output'
 # RNA sample groupings
 mat_samples = ["HHCCW", "HHCCX", "HHCCY", "HHCGA", "HHCGB", "HHCGG", "HHCGH", "HHCGN", "HHCGO", "HHCGP", "HHCGT", "HHCGU", "HHCGW", "HHCGX", "HHCGY"]
 zoosp_samples = ["HHCGC", "HHCGS"]
@@ -523,6 +524,10 @@ pval_cutoff = 0.05
 tpm_cutoff = 1
 # For orthofinder alignment
 GF_NAME = "Neosp1"
+
+# Create output folder if it doesn't exist
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Import files
@@ -1267,7 +1272,10 @@ volcano_df = volcano_df.reset_index(drop=True)
 # color for lightblue3: #9AC0CD
 # color for gray40: #666666
 # color for indianred3: #CD5555
+current_folder = os.getcwd()
+os.chdir(output_folder)
 visuz.GeneExpression.volcano(df=volcano_df, lfc='log2FC', pv='padj', show=False, plotlegend=True, legendpos='upper right', axtickfontname="Roboto", axlabelfontsize=12, axtickfontsize=12, legendanchor=(1.01, 1.01), color=["#9AC0CD","#666666","#CD5555"], valpha=0.5, axxlabel='log2-fold change', axylabel='-log10(q)', sign_line=True,legendlabels=['upregulated in mats*','no significant regulation','upregulated in zoospores*'],lfc_thr=(log2FC_cutoff,log2FC_cutoff),pv_thr=(pval_cutoff,pval_cutoff))
+os.chdir(current_folder)
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Export files

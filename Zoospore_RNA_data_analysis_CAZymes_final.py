@@ -3,6 +3,7 @@ Zoospore RNA Manuscript: RNA Data Analysis for CAZyme and Cellulosome Annotation
 
 @author: Lazarina Butkovich
 """
+import os
 from os.path import join as pjoin
 import pandas as pd
 import numpy as np
@@ -214,8 +215,12 @@ def fisher_filter_sort(df):
 Changeable values    **************************************
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # Import data to append orthologs to
-input_folder = r'C:\Users\lazab\Desktop\python_scripts\workspace\Zoospore_RNA' 
-output_folder = r'C:\Users\lazab\Desktop\python_scripts\workspace_output\Zoospore_RNA'
+input_folder = r'input' 
+output_folder = r'output'
+
+# Create output folder if it doesn't exist
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
 
 """
 Inputs
