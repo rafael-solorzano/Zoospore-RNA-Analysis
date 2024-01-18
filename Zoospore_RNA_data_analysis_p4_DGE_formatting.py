@@ -8,7 +8,7 @@ from os.path import join as pjoin
 import pandas as pd
 
 """
-This script is designed to analyze the DESeq2-processed RNA-seq data comparing N. californiae zoospore vs fungal mat samples, in order to perform differential gene expression analysis for specific gene annotations. This script should be run after the content in the first RNA data analysis script has been run. This script can be modified to consider various annotations (ie: secondary metabolites, transcription factors, specific genes highlighted in published papers) that are not already readily encapsulated in the broad annotation categories (ie: KOG, GO, KEGG, IPR), or need extra formatting.
+This script is designed to analyze the DESeq2-processed RNA-seq data comparing N. californiae zoospore vs fungal mat samples, in order to perform differential gene expression analysis for specific gene annotations. This script can be modified to consider various annotations (ie: secondary metabolites, transcription factors, specific genes highlighted in published papers) that are not already readily encapsulated in the broad annotation categories (ie: KOG, GO, KEGG, IPR), or which need extra formatting.
 """
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -93,60 +93,65 @@ def add_to_df(df, X_annot_pd, annot_cols_list, shared_col='proteinID'):
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Import Files and Make Annotation Dataframes
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-# Import files
 input_folder = r'input' 
+temp_folder = r'temp'
 output_folder = r'output'
 
-# Create output folder if it doesn't exist
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
-
-# A) Essential file:
-# DGE summary from 1st script 
-DGE_summary_filename = "DGE_summary_output.xlsx"
-DGE_summary = pd.read_excel(pjoin(*[output_folder, DGE_summary_filename]), sheet_name='DGE_summary')
-
-# B) Specific annotation types (You can modify these, or add/remove files and subsequent corresponding code, as needed for your application)
-
-# Secondary Metabolites
-SM_annot_filename = "Neosp1_SMs_orthologs_20221024.xlsx"
-SM_annot = pd.read_excel(pjoin(*[input_folder, SM_annot_filename]), sheet_name='SMs')
-
-# Hydrogenosomes
+"""
+File names for import
+"""
+# Manually Added Inputs:
+# You can modify these, or add/remove files and subsequent corresponding code, as needed for your application
+# 1) Secondary Metabolites
+SM_annot_filename = "Neosp1_SMs_orthologs.xlsx"
+# 2) Hydrogenosomes
 hydrogenosome_annot_filename = "G1_hydrogenosomes.xlsx"
-hydrogenosome_annot = pd.read_excel(pjoin(*[input_folder, hydrogenosome_annot_filename]), sheet_name='Hsome function')
-hydrogenosome_localization_annot = pd.read_excel(pjoin(*[input_folder, hydrogenosome_annot_filename]), sheet_name='localization notes')
-
-# SWEETs
+# 3) SWEETs
 SWEET_annot_filename = "G1_SWEETs.xlsx"
-SWEET_annot = pd.read_excel(pjoin(*[input_folder, SWEET_annot_filename]), sheet_name='Sheet1')
-
-# Transcription factors (TFs)
-TF_annot_filename = 'G1_transcription_factors_20230316.xlsx'
-TF_annot = pd.read_excel(pjoin(*[input_folder, TF_annot_filename]), sheet_name='Sheet1')
-
-# Unfolded protein response genes and heat shock response genes from 2016 S. Seppala Microb Cell Fact paper
+# 4) Transcription factors (TFs)
+TF_annot_filename = 'G1_transcription_factors.xlsx'
+# 5) Unfolded protein response genes and heat shock response genes from S. Seppala et al. (https://doi.org/10.1186/s12934-016-0611-7)
 UPR_HSR_annot_filename = 'G1_UPR_HSR.csv'
-UPR_HSR_annot = pd.read_csv(pjoin(*[input_folder, UPR_HSR_annot_filename]))
-
-# I ran local BLASTp of G1 genes to a downloaded FASTA file of TCDB (Transporter Classification Database) proteins
-# I used a script to process/filter the BLASTp results
+# 6) Local BLASTp results for G1 genes to TCDB (Transporter Classification Database) proteins. Include info on TCDB protein family, ChEBI ID, and superfamily
 tcdb_blast_filename = "output_TCDB_BLASTp_filtered.csv"
-tcdb_blast = pjoin(*[input_folder, tcdb_blast_filename])
-tcdb_blast = pd.read_csv(tcdb_blast)
-
-# Import info on transporter family, ChEBID, and superfamily
 tcdb_fam_desc_filename = "TC_specific_family_defs.csv"
 tcdb_chebid_filename = "TC_ChEBI_IDs.csv"
 tcdb_superfam_desc_filename = "TC_superfamily_defs.csv"
-# Import TC def data into dataframes. These files already have headers
+
+# Inputs from Previous Scripts (deposited in temp folder)
+# 1) DGE_summary_output from 1st script 
+DGE_summary_filename = "DGE_Summary_Fisher_main_annotations.xlsx"
+
+
+"""
+Import files
+"""
+# Manual inputs in input_folder
+SM_annot = pd.read_excel(pjoin(*[input_folder, SM_annot_filename]), sheet_name='SMs')
+
+hydrogenosome_annot = pd.read_excel(pjoin(*[input_folder, hydrogenosome_annot_filename]), sheet_name='Hsome function')
+hydrogenosome_localization_annot = pd.read_excel(pjoin(*[input_folder, hydrogenosome_annot_filename]), sheet_name='localization notes')
+
+SWEET_annot = pd.read_excel(pjoin(*[input_folder, SWEET_annot_filename]), sheet_name='Sheet1')
+
+TF_annot = pd.read_excel(pjoin(*[input_folder, TF_annot_filename]), sheet_name='Sheet1')
+
+UPR_HSR_annot = pd.read_csv(pjoin(*[input_folder, UPR_HSR_annot_filename]))
+
+tcdb_blast = pd.read_csv(pjoin(*[input_folder, tcdb_blast_filename]))
 tcdb_fam_desc = pd.read_csv(pjoin(*[input_folder, tcdb_fam_desc_filename]))
 tcdb_chebid = pd.read_csv(pjoin(*[input_folder, tcdb_chebid_filename]))
 tcdb_superfam_desc = pd.read_csv(pjoin(*[input_folder, tcdb_superfam_desc_filename]))
 
+# Inputs in temp_folder from previous scripts 
+DGE_summary = pd.read_excel(pjoin(*[temp_folder, DGE_summary_filename]), sheet_name='DGE_summary')
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Expand upon annotations in DGE_summary
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# For each annotation type, I  make a new column in DGE_summary with the annotation values. I use the add_to_df function to add the annotation columns to DGE_summary. The add_to_df function adds the annotation columns from the annotation dataframes to DGE_summary. The add_to_df function uses the proteinID column to match the annotation values to the correct proteinID in DGE_summary.
+
 """
 Formatting Secondary Metabolites Excel
 """
@@ -243,10 +248,7 @@ UPR_HSR_annot = add_to_df(UPR_HSR_annot, DGE_summary, ['log2FC','padj','sig','ma
 """
 Transporters from TCDB (Transporter Classification Database)
 """
-# I ran local BLASTp of G1 genes to a downloaded FASTA file of TCDB proteins
-# I used a script to process/filter the BLASTp results
-# Here, I want to align that output to DGE_summary
-# Additionally, I use the subject_seq_id column to extract additional info about each TCDB protein
+# I ran local BLASTp of G1 genes to a downloaded FASTA file of TCDB proteins. I processed/filtered the BLASTp results. I want to align that output to DGE_summary. Additionally, I use the subject_seq_id column to extract additional info about each TCDB protein.
 
 # Change first column query_seq_id to proteinID
 tcdb_blast.rename(columns={'query_seq_id':'proteinID'}, inplace=True)
@@ -280,6 +282,10 @@ Export files
 """
 Write each dataframe to a different sheet in an output Excel
 """
+# Create output folder if it doesn't exist
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
 name_out = "DGE_summary_output_formatted.xlsx"
 file_path_out = pjoin(*[output_folder, name_out])
 
