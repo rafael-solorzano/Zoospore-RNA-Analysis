@@ -216,37 +216,27 @@ Changeable values    **************************************
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # Import data to append orthologs to
 input_folder = r'input' 
+temp_folder = r'temp'
 output_folder = r'output'
-
-# Create output folder if it doesn't exist
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
 
 """
 Inputs
 """
-# DGE Summary:
-DGE_summary_filename = "DGE_summary_output.xlsx"
-DGE_summary = pd.read_excel(pjoin(*[output_folder, DGE_summary_filename]), sheet_name='DGE_summary')
+# Manually Added Inputs:
+# 1) DGE Output Summary:
+DGE_summary_filename = "DGE_Summary_Fisher_main_annotations.xlsx"
 
-# CAZymes:
+# Inputs from Previous Scripts (deposited in temp folder)
+# 1) dbCAN2 CAZyme predictions:
 # dbCAN2 (https://doi.org/10.1093/nar/gky418) is a tool for annotating CAZYme annotations. I predominately used CAZYme annotations from JGI's Mycocosm, but you can also look at dbCAN2 CAZyme predicitons. This would be more helpful for annotating de novo transcripts from this dataset.
 # List dbCAN2 data filenames:
 dbCAN2_filenames = ['G1_part1_dbCAN_output','G1_part2_dbCAN_output','G1_part3_dbCAN_output','G1_part4_dbCAN_output','G1_part5_dbCAN_output','G1_part6_dbCAN_output']
 dbCAN2_file_ext = ".xlsx"
 
-# In order to match proteomics data to the genes listed in DGE Summary, we need to compare sequences by BLASTp. This can be accomplished by running a local BLASTp of the proteomics data amino acid sequences against the amino acid sequences for the genes listed in DGE Summary, which can be downloaded from JGI's Mycocosm. See the Materials and Methods section for the strictness of the cutoffs for BLASTp match. Ensure that the BLASTp results (imported here as 'cellulosomes_BLASTp_results.csv') have only one hit per gene and that there are no repeats of the same gene in the BLASTp results (remove duplicates).
-# Import cellulosomes_BLASTp_results.csv from output_folder using pjoin
-cellulosomes_BLASTp_results = pd.read_csv(pjoin(input_folder, 'cellulosomes_BLASTp_results.csv'))
-# Cellulosome-associated:
-cellulosome_annot_filename = "F5-7proteomics_results_valuesOnly_cellulosomesOnly.csv"
-cellulosome_df = pd.read_csv(pjoin(*[input_folder, cellulosome_annot_filename]))
-# Remove rows with value "#VALUE!" in proteinID column
-cellulosome_df = cellulosome_df[cellulosome_df['proteinID'] != '#VALUE!']
-# Make proteinID column values integers
-cellulosome_df['proteinID'] = cellulosome_df['proteinID'].astype(int)
-# Reset index
-cellulosome_df = cellulosome_df.reset_index(drop=True)
+# 2) Cellulosome proteomics data and annotations
+# In order to match proteomics data to the genes listed in DGE Summary, we need to compare sequences by BLASTp. This can be accomplished by running a local BLASTp of the proteomics data amino acid sequences against the amino acid sequences for the genes listed in DGE Summary, which can be downloaded from JGI MycoCosm. The BLASTp match cutoffs are as follows: e-value < 1E-5, percent identity > 90%, and “query coverage per HSP” > 75%. Ensure that the BLASTp results (imported here as 'cellulosomes_BLASTp_results.csv') have only one hit per gene and that there are no repeats of the same gene in the BLASTp results (remove duplicates).
+cellulosomes_BLASTp_results_filename = "cellulosomes_BLASTp_results.csv"
+cellulosome_annot_filename = "G1_cellulosomes_proteomics.csv"
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -277,6 +267,10 @@ Append dbCAN2 results to DGE_summary and create output excel
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # Except for proteinID and GeneID, rename dbCAN2 columns to start with 'dbCAN2_'
 dbCAN2_df = dbCAN2_df.rename(columns={'proteinID':'proteinID','Gene ID':'dbCAN2_GeneID','EC#':'dbCAN2_EC#','HMMER':'dbCAN2_HMMER','dbCAN_sub':'dbCAN2_dbCAN_sub','DIAMOND':'dbCAN2_DIAMOND','Signalp':'dbCAN2_Signalp','#ofTools':'dbCAN2_#ofTools'})
+
+# Import DGE_summary
+DGE_summary = pd.read_excel(pjoin(*[temp_folder, DGE_summary_filename]), sheet_name='DGE_summary')
+
 # Add dbCAN2 results to DGE_summary 
 new_cols_dbCAN2 = ['dbCAN2_EC#','dbCAN2_HMMER','dbCAN2_dbCAN_sub','dbCAN2_DIAMOND','dbCAN2_Signalp','dbCAN2_#ofTools']
 DGE_summary = add_to_df(DGE_summary, dbCAN2_df, new_cols_dbCAN2)
@@ -284,6 +278,10 @@ DGE_summary = add_to_df(DGE_summary, dbCAN2_df, new_cols_dbCAN2)
 cols = DGE_summary.columns.tolist()
 cols = cols[:12] + new_cols_dbCAN2 + cols[12:len(cols)-len(new_cols_dbCAN2)]
 DGE_summary = DGE_summary[cols]
+
+# Create output folder if it doesn't exist
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
 
 # Sheet with all proteinIDs from cellulosome_df
 name_out = 'DGE_summary_CAZymes_dbCAN2_cellulosomes'
@@ -310,6 +308,17 @@ dbCAN2_KOG_defline_counts = DGE_summary['KOG_defline'].value_counts()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Add Transcriptomic Data to Cellulosome-proteomics table and export
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# Import cellulosomes_BLASTp_results.csv from output_folder using pjoin
+cellulosomes_BLASTp_results = pd.read_csv(pjoin(input_folder,cellulosomes_BLASTp_results_filename))
+# Cellulosome-associated:
+cellulosome_df = pd.read_csv(pjoin(*[input_folder, cellulosome_annot_filename]))
+# Remove rows with value "#VALUE!" in proteinID column
+cellulosome_df = cellulosome_df[cellulosome_df['proteinID'] != '#VALUE!']
+# Make proteinID column values integers
+cellulosome_df['proteinID'] = cellulosome_df['proteinID'].astype(int)
+# Reset index
+cellulosome_df = cellulosome_df.reset_index(drop=True)
+
 # Reset DGE_Summmary index
 DGE_summary = DGE_summary.reset_index(drop=True)
 
