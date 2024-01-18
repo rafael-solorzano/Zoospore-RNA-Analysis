@@ -160,5 +160,6 @@ cython_debug/
 #.idea/
 
 output/
+outputs_for_comparison/
 temp/
 input_backup/
