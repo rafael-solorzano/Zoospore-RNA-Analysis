@@ -120,7 +120,7 @@ tcdb_superfam_desc_filename = "TC_superfamily_defs.csv"
 
 # Inputs from Previous Scripts (deposited in temp folder)
 # 1) DGE_summary_output from 1st script 
-DGE_summary_filename = "DGE_Summary_Fisher_main_annotations.xlsx"
+DGE_summary_filename = "DGE_Summary_output_main.xlsx"
 
 
 """

@@ -224,7 +224,7 @@ Inputs
 """
 # Manually Added Inputs:
 # 1) DGE Output Summary:
-DGE_summary_filename = "DGE_Summary_Fisher_main_annotations.xlsx"
+DGE_summary_filename = "DGE_Summary_output_main.xlsx"
 
 # Inputs from Previous Scripts (deposited in temp folder)
 # 1) dbCAN2 CAZyme predictions:
@@ -284,7 +284,7 @@ if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 # Sheet with all proteinIDs from cellulosome_df
-name_out = 'DGE_summary_CAZymes_dbCAN2_cellulosomes'
+name_out = 'DGE_summary_dbCAN2_and_cellulosomes'
 file_path_out = pjoin(*[output_folder, name_out + '.xlsx'])
 # https://xlsxwriter.readthedocs.io/example_pandas_multiple.html
 writer = pd.ExcelWriter(file_path_out, engine='xlsxwriter')

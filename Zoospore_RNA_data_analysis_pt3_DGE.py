@@ -1248,7 +1248,7 @@ writer.close()
 """
 Write each dataframe to a different sheet in output excel
 """
-filename_out = "DGE_Summary_Fisher_main_annotations.xlsx"
+filename_out = "DGE_Summary_output_main.xlsx"
 file_path_out = pjoin(*[output_folder, filename_out])
 
 # https://xlsxwriter.readthedocs.io/example_pandas_multiple.html
