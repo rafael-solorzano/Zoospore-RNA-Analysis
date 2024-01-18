@@ -18,50 +18,6 @@ Script description
 This script is designed to analyze the RNA-seq data for N. californiae zoospore vs fungal mat samples. 
 
 """
-# Goal: transcriptomic data analysis for N. californiae zoospore vs fungal mat RNA-seq data.
-
-"""
-File names for import
-"""
-# Manually Added Inputs: 
-# 1) Downloaded MycoCosm Annotations: 
-    # Multiple annotation files:
-KOG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KOG.tsv"
-GO_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_GO.tsv"
-IPR_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_IPR.tsv"
-KEGG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KEGG.tsv"
-# Additional MycoCosm Annotations:
-# 2) Secondary metabolites:
-SM_annot_filename = "Neosp1_SMs_orthologs_20221024.xlsx"
-# 3) OrthoFinder data:
-Orthologs_filename = "Orthogroups_GF_20220921.tsv"
-# 4) CAZymes with selected dbCAN2 predictions:
-CAZyme_annot_filename = "G1_cazymes_with_dbCAN2.csv"
-# 5) Cellulosome-associated proteinIDs:
-cellulosome_annot_filename = "F5-7proteomics_results_valuesOnly_cellulosomesOnly.csv"
-
-
-# Inputs from Previous Scripts (deposited in temp folder)
-# 1) Zoospore vs fungal mat DESeq2 data:
-deseq2_filename = "deseq2_output_20230315.csv"
-    # From my DESeq2 analysis in RStudio
-    # Columns: proteinID, baseMean, mat_vs_zoosp_log2FC, lfcSE, stat, pvalue, mat_vs_zoosp_Padj
-    # R v4.2.2
-    # Bioconductor v3.16
-    # DESeq2 v1.36.0
-
-# 2) DESeq2 Normalized counts:
-deseq2_norm_counts_filename = "deseq2_normalized_counts_labeled_20230315.csv"
-    # Columns: proteinID, ~all sample names~,zoosp_avg_DESeq2_norm_cts, mat_avg_DESeq2_norm_cts, zoosp_var_DESeq2_norm_cts, mat_var_DESeq2_norm_cts, log2FC_check
-
-# 3) Counts:
-counts_filename = "counts_RNAseq_updated.csv"
-    # From "Zoospore_data_cleanup_pipeline.py"
-
-# 4) TPM Counts:
-tpm_filename = "tpm_counts_RNAseq_updated.csv" 
-    # From "Zoospore_data_cleanup_pipeline.py"
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Functions
@@ -417,6 +373,12 @@ def fisher_exact_test_run_for_group(annot_X_pd, num_genes_upreg, num_genes_total
     df['Fisher_above_min_num_genes_cutoff'] = Fisher_above_min_num_genes_cutoff
     return df
 
+def fisher_start(df, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total, zoosp_col = 'zoosp upreg count', mat_col = 'mat upreg count'):
+    # Run fisher_exact_test_run_for_group for zoosp and then for mat. Return both dfs
+    df_zoosp = fisher_exact_test_run_for_group(df, num_genes_upreg_zoosp, num_genes_total, zoosp_col)
+    df_mat = fisher_exact_test_run_for_group(df, num_genes_upreg_mat, num_genes_total, mat_col)
+    return df_zoosp, df_mat
+
 def count_non_NaN_in_df(df,col_name):
     """
     Count the number of values in the col_name column in df that do not have NaN value
@@ -477,12 +439,6 @@ def extract_proteinIDs_from_orthologs_column(ortho_list, gf_name):
 
     return final_proteinIDs, counts_list
 
-def fisher_start(df, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total, zoosp_col = 'zoosp upreg count', mat_col = 'mat upreg count'):
-    # Run fisher_exact_test_run_for_group for zoosp and then for mat. Return both dfs
-    df_zoosp = fisher_exact_test_run_for_group(df, num_genes_upreg_zoosp, num_genes_total, zoosp_col)
-    df_mat = fisher_exact_test_run_for_group(df, num_genes_upreg_mat, num_genes_total, mat_col)
-    return df_zoosp, df_mat
-
 def print_stats(df, col, keyword, zoosp_upreg_col="zoosp_upreg",mat_upreg_col="mat_upreg"):
     # Print the number of rows in df that contain keyword in col
     print("Number of proteinIDs with " + keyword + " in " + col + ": " + str(len(df[df[col].str.contains(keyword)])))
@@ -519,9 +475,45 @@ tpm_cutoff = 1
 # For orthofinder alignment
 GF_NAME = "Neosp1"
 
-# Create output folder if it doesn't exist
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
+    
+"""
+File names for import
+"""
+# Manually Added Inputs: 
+# 1) Downloaded MycoCosm Annotations: 
+    # Multiple annotation files:
+KOG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KOG.tsv"
+GO_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_GO.tsv"
+IPR_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_IPR.tsv"
+KEGG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KEGG.tsv"
+# Additional MycoCosm Annotations:
+# 2) Secondary metabolites:
+SM_annot_filename = "Neosp1_SMs_orthologs_20221024.xlsx"
+# 3) OrthoFinder data:
+Orthologs_filename = "Orthogroups_GF_20220921.tsv"
+# 4) CAZymes with selected dbCAN2 predictions:
+CAZyme_annot_filename = "G1_cazymes_with_dbCAN2.csv"
+# 5) Cellulosome-associated proteinIDs:
+cellulosome_annot_filename = "F5-7proteomics_results_valuesOnly_cellulosomesOnly.csv"
+
+# Inputs from Previous Scripts (deposited in temp folder)
+# 1) Zoospore vs fungal mat DESeq2 data:
+deseq2_filename = "deseq2_output_20230315.csv"
+    # From my DESeq2 analysis in RStudio
+    # Columns: proteinID, baseMean, mat_vs_zoosp_log2FC, lfcSE, stat, pvalue, mat_vs_zoosp_Padj
+    # R v4.2.2
+    # Bioconductor v3.16
+    # DESeq2 v1.36.0
+# 2) DESeq2 Normalized counts:
+deseq2_norm_counts_filename = "deseq2_normalized_counts_labeled_20230315.csv"
+    # Columns: proteinID, ~all sample names~,zoosp_avg_DESeq2_norm_cts, mat_avg_DESeq2_norm_cts, zoosp_var_DESeq2_norm_cts, mat_var_DESeq2_norm_cts, log2FC_check
+# 3) Counts:
+counts_filename = "counts_RNAseq_updated.csv"
+    # From "Zoospore_data_cleanup_pipeline.py"
+# 4) TPM Counts:
+tpm_filename = "tpm_counts_RNAseq_updated.csv" 
+    # From "Zoospore_data_cleanup_pipeline.py"
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Import files
@@ -635,6 +627,10 @@ DGE_summary['zoosp_upreg'] = np.where((DGE_summary['log2FC'] < -log2FC_cutoff) &
 """
 Export this basic DGE summary
 """
+# Create output folder if it doesn't exist
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
 filename_out = "DGE_summary_output_basic.xlsx"
 file_path_out = pjoin(*[output_folder, filename_out])
 
@@ -778,7 +774,6 @@ start = time.time()
 """
 OrthoFinder data
 """
-
 # Extract the header name of the GF ortholog columns
 anasp1_Ortho_header = df_OrthoFinder.columns[1]
 caecom1_Ortho_header = df_OrthoFinder.columns[2]
@@ -799,12 +794,10 @@ else:
     print("Error: GF name not recognized")
 
 # Some values in df_OrthoFinder have multiple proteinIDs.
-# I need to find a way to read a value as potentially multiple different proteinIDs
 # The gene name is formatted like "jgi|GF_NAME|PROTEINID#|..."
 # where GF_name is "Anasp1", "Caecom1", "Neosp1", or "Pirfi3"
 # These names can be gotten also from the header, as text before the first "_"
 # PROTEINID# is the proteinID number
-# ... probably describes the gene location or scaffold etc
 # Gene names are separated by ", "
 
 # Create a new column in DGE_summary for ortholog name to search. The format will be "jgi|" + GF_NAME + "|" + PROTEINID + "|"
@@ -843,11 +836,6 @@ for source_gene in proteinIDs_Ortho_format:
         # if ortho_description is not NaN:
         if isinstance(ortho_description, str):
             if source_gene in ortho_description:
-                # Print source_gene and ortho_description types
-                # print(type(source_gene))
-                # print(type(ortho_description))
-                # There is an error when nan appears in ortho_description
-                # source_orthogroups.append(ortho_description)
                 filled = 1
                 # append index position of ortho_description to index_Ortho
                 index = GF_ortholog_search.index(ortho_description)
@@ -872,11 +860,6 @@ for source_gene in proteinIDs_Ortho_format:
                     pirfi3_source_orthologs.append(pirfi3_all_orthologs[index])
                 else:
                     pirfi3_source_orthologs.append("none")
-
-                # caecom1_source_orthologs.append(caecom1_all_orthologs[index])
-                # neosp1_source_orthologs.append(neosp1_all_orthologs[index])
-                # pirfi3_source_orthologs.append(pirfi3_all_orthologs[index])
-
                 # Also grab orthogroup name
                 source_orthogroups.append(all_orthogroups[index])
                 break
@@ -974,7 +957,7 @@ annot_key_CAZyme_classes_pd = make_annot_proteinID_pd_for_keywords_list(CAZyme_d
 """
 Secondary Metabolites (SMs)
 """
-# Note, it is not necessary to run Fisher exact tests for SMs. I will not perform Fisher Exact test for any SM annotations, since the sample groups are too small.
+# Note, it is not necessary to run Fisher exact tests for SMs. I will not perform Fisher Exact test for any SM annotations, since the annotation groups are too small.
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1032,13 +1015,7 @@ Fisher Exact Test
 
 # Create lists for columns in Fisher_summary dataframes : Fisher_mat_upreg_p_val, Fisher_zoosp_upreg_p_val
 
-# Fisher_summary dataframes will be a collection of dataframes, where each has a column of unique annotations, a column with lists of proteinIDs with that annotation, counts of how many of those proteinIDs are sig upreg in mats and in zoospores
-
-# Dataframe ideas: Fisher_summary_KOG_defline, Fisher_summary_GO_name, Fisher_summary_IPR_desc, Fisher_summary_KEGG_desc, Fisher_summary_CAZyme_defline
-
-"# Q: would it be easier to create dictionaries from the original annot_dataframes, rather than working off of DGE_summary for the annot-proteinIDs information?"
-# dictionary format: {annotation: [proteinIDs]}
-# then, dataframe format: annotation, proteinIDs, mat_upreg (# proteinIDs), zoosp_upreg (# proteinIDs)
+# Fisher_summary dataframes are a collection of dataframes, where each has a column of unique annotations, a column with lists of proteinIDs with that annotation, counts of how many of those proteinIDs are sig upreg in mats and in zoospores
 
 # Create 2x2 contingency table
 # 4 squares of the table: a, b, c, and d, all non-negative integers
@@ -1047,24 +1024,15 @@ Fisher Exact Test
 # c = number of total genes with specific annotation - a
 # d = number of total genes - a - b - c
 
-# stat.fisher_exact function returns odd_ratio, p_value
 fisher_p_value_cutoff = 0.05
-min_annot_size = 10 # minimum number of proteinIDs with specific annotation, to avoid positive hits largely due to small sample size. min_annot_size = 10 is arbitrary, so we can change this number. Others have used small sample sizes with Fisher Exact, but some sources say these results are questionable (https://influentialpoints.com/Training/Fishers_exact_test_use_and_misuse.htm)
-
-
-# Run Fisher exact tests
-"""
-KOG Fisher Exact tests
-"""
-
-# Use def fisher_exact_test_run_for_group(annot_X_pd, num_genes_upreg, num_genes_total, upreg_col_name, gene_count_col_name='proteinIDs count')
-# Option d1: 
+min_annot_size = 10 # minimum number of proteinIDs with specific annotation, to avoid positive hits largely due to small sample size. min_annot_size = 10 is arbitrary, so you can adjust this number. Others have used small sample sizes with Fisher's Exact Test, but some sources mark these results as questionable (https://influentialpoints.com/Training/Fishers_exact_test_use_and_misuse.htm)
 num_genes_total = len(DGE_summary.index) # note, num_genes_total includes unannotated genes (=19968)
 
-# Option b1: For mat/zoosp upreg counts, include counts for unannotated genes (genes without KOG annotations or with NaN annotations)
-# num_genes_upreg_mat and num_genes_upreg_zoosp 
+# The following functions are used to run Fisher Exact tests for each annotation type: fisher_start, fisher_exact_test_run_for_group, fisher_exact_test, fisher_exact_verify
 
-# Using option 1:
+"""
+KOG Class Fisher Exact tests
+"""
 Fisher_KOG_class_zoosp_upreg_unfiltered, Fisher_KOG_class_mat_upreg_unfiltered = fisher_start(annot_KOG_class_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 # sort pandas dataframe Fisher_KOG_class_zoosp_upreg by increasing Fisher_p-value
 Fisher_KOG_class_zoosp_upreg_unfiltered = Fisher_KOG_class_zoosp_upreg_unfiltered.sort_values(by=['Fisher_p-value'], ascending=True)
@@ -1078,6 +1046,7 @@ Fisher_KOG_zoosp_upreg_unfiltered, Fisher_KOG_mat_upreg_unfiltered = fisher_star
 
 print('Finished running Fisher exact tests for KOG annotations, took %.2f seconds' % ((time.time() - start)))
 start = time.time()
+
 """
 GO Fisher Exact tests
 """
@@ -1106,7 +1075,6 @@ KEGG Pathway Fisher Exact tests
 """
 Fisher_KEGG_pathway_zoosp_upreg_unfiltered, Fisher_KEGG_pathway_mat_upreg_unfiltered = fisher_start(annot_KEGG_pathway_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
-
 print('Finished running Fisher exact tests for KEGG pathway annotations, took %.2f seconds' % ((time.time() - start)))
 
 """
@@ -1115,7 +1083,6 @@ KEGG Pathway Class Fisher Exact tests
 Fisher_KEGG_pathway_class_zoosp_upreg_unfiltered, Fisher_KEGG_pathway_class_mat_upreg_unfiltered = fisher_start(annot_KEGG_pathway_class_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
 print('Finished running Fisher exact tests for KEGG pathway class annotations, took %.2f seconds' % ((time.time() - start)))
-
 
 """
 CAZyme Fisher Exact tests
@@ -1171,7 +1138,6 @@ General Statistics and Tables to Export
 """
 General Stats
 """
-
 stat_description = []
 stat_value = []
 
@@ -1232,15 +1198,6 @@ stats_pd = pd.DataFrame({'Statistic': stat_description, 'Number of Genes': stat_
 # remove index from stats_pd
 stats_pd = stats_pd.reset_index(drop=True)
 
-# """
-# KOG top 10 upregulated annotations in mats vs zoospores
-# """
-# # Get top 10 upregulated KOGs in zoospores based on lowest p-value from Fisher Exact test data. Only include columns 0-3 and 8-10
-# KOG_top_10_upreg_zoosp = Fisher_KOG_zoosp_upreg.iloc[0:10,:]
-# KOG_top_10_upreg_zoosp = KOG_top_10_upreg_zoosp[KOG_top_10_upreg_zoosp.columns[[0,1,2,3,8,9,10]]]
-# KOG_top_10_upreg_mat = Fisher_KOG_mat_upreg.iloc[0:10,:]
-# KOG_top_10_upreg_mat = KOG_top_10_upreg_mat[KOG_top_10_upreg_mat.columns[[0,1,2,3,8,9,10]]]
-# ^^^^ These tables are pretty similar to the Fisher tables I'm already exporting as sheet tabs in DGE_Summary...xlsx, so tables with top X should be hand-picked based on the Fisher tables
 
 """
 Volcano Plot
@@ -1262,7 +1219,6 @@ volcano_df = DGE_summary.copy()
 # Remove values from volcano_df that have blanks/NA in the log2FC column
 volcano_df = volcano_df[volcano_df['log2FC'].notna()]
 # Remove values from volcano_df that have blanks/NA in the padj column
-# Q: Why are there blanks/NA in the padj column, even though some of these rows do have values in the log2FC, mat_tpm_avg, and zoosp_tpm_avg columns?
 volcano_df = volcano_df[volcano_df['padj'].notna()]
 
 # Reset index
@@ -1279,6 +1235,7 @@ os.chdir(output_folder)
 visuz.GeneExpression.volcano(df=volcano_df, lfc='log2FC', pv='padj', show=False, plotlegend=True, legendpos='upper right', axtickfontname="Roboto", axlabelfontsize=12, axtickfontsize=12, legendanchor=(1.01, 1.01), color=["#9AC0CD","#666666","#CD5555"], valpha=0.5, axxlabel='log2-fold change', axylabel='-log10(q)', sign_line=True,legendlabels=['upregulated in mats*','no significant regulation','upregulated in zoospores*'],lfc_thr=(log2FC_cutoff,log2FC_cutoff),pv_thr=(pval_cutoff,pval_cutoff))
 os.chdir(current_folder)
 
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Export files
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -1293,7 +1250,6 @@ stats_pd.to_excel(writer, sheet_name='General',index=True)
 
 Fisher_KOG_class_zoosp_upreg.to_excel(writer, sheet_name='Fisher_KOG_class_zoosp_upreg',index=True)
 Fisher_KOG_class_mat_upreg.to_excel(writer, sheet_name='Fisher_KOG_class_mat_upreg',index=True)
-
 
 # Close the Pandas Excel writer and output the Excel file.
 writer.close()
@@ -1384,48 +1340,3 @@ annot_CAZyme_defline_pd.to_excel(writer, sheet_name='CAZymes_defline',index=True
 
 # Close the Pandas Excel writer and output the Excel file.
 writer.close()
-
-"""
-Print statements about specific results
-"""
-# print Number of proteinIDs with DOC2 or CBM10 Dockerin domain
-
-# Make dockerin_pd dataframe from DGE_summary
-dockerin_pd = DGE_summary
-
-# filter for rows with non-blank values in CAZyme_description colulmn
-dockerin_pd = dockerin_pd[dockerin_pd['CAZyme_description'].notnull()]
-
-# filter for rows with values that contain 'DOC2' or 'CBM10' in CAZyme_description colulmn
-dockerin_pd = dockerin_pd[dockerin_pd['CAZyme_description'].str.contains('DOC2') | dockerin_pd['CAZyme_description'].str.contains('CBM10')]
-
-# print number of rows in dockerin_pd
-print("Number of proteinIDs with DOC2 or CBM10 Dockerin domain: ", dockerin_pd.shape[0])
-
-# print sum of mat_upreg in dockerin_pd
-print("Number of proteinIDs Dockerin domains upregulated in mats: ", dockerin_pd['mat_upreg'].sum())
-# print sum of zoosp_upreg in dockerin_pd
-print("Number of proteinIDs Dockerin domains upregulated in zoospores: ", dockerin_pd['zoosp_upreg'].sum())
-# print number of rows with mat_tpm_avg > 1:
-print("Number of proteinIDs Dockerin domains expressed in mats (with mat_tpm_avg > 1): ", dockerin_pd[dockerin_pd['mat_tpm_avg'] > 1].shape[0])
-# print number of rows with zoosp_tpm_avg > 1:
-print("Number of proteinIDs Dockerin domains expressed in zoospores (with zoosp_tpm_avg > 1): ", dockerin_pd[dockerin_pd['zoosp_tpm_avg'] > 1].shape[0])
-
-# Print the number of rows in DGE_summary that have no value in any of the following columns: KOG_defline, GO_name, IPR_desc, or KEGG_definition
-print("Number of proteinIDs with no KOG, GO, IPR, or KEGG annotation: ", DGE_summary[(DGE_summary['KOG_defline'].isnull()) & (DGE_summary['GO_name'].isnull()) & (DGE_summary['IPR_desc'].isnull()) & (DGE_summary['KEGG_definition'].isnull())].shape[0])
-
-# Print individual Fisher exact test results
-# Print the Fisher exact value for IPR domain pectin lyase-like
-print("Fisher exact test result for IPR domain pectin lyase-like zoospore upregulation: ", fisher_exact_test(43, 3343, 83, 16499))
-
-# Print the Fisher exact value for Class C GPCRs
-print("Fisher exact test result for Class C GPCRs zoospore upregulation: ", fisher_exact_test(13, 3373, 35, 16547))
-# output 0.07985084001395924 p-value
-# Print verify test
-print(fisher_exact_verify(13, 3373, 35, 16547, 0.07985084001395924))
-
-# Print the Fisher exact value for transcription factors in zoospores
-# output 4.295e-10 p-value
-print("Fisher exact test result for transcription factors zoospore upregulation: ", fisher_exact_test(60, 3326, 100, 16482))
-# Print verify test
-print(fisher_exact_verify(60, 3326, 100, 16482, 4.295e-10))
