@@ -1,4 +1,5 @@
 ############################################################
+
 # Zoospore RNA Manuscript: DESEQ2 Analysis in R by Lazarina Butkovich
 
 # https://lashlock.github.io/compbio/R_presentation.html
@@ -6,38 +7,15 @@
 
 # Helpful website: http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#quick-start
 
-############################################################
 
-# Required packages
+############################################################
+# Install DESeq2
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-
 BiocManager::install("DESeq2")
-############################################################
-
-############################################################
-#Necessary libraries
 library("DESeq2")
-# library('GenomicRanges')
-# ##library('rtracklayer')
-# require(gplots)
-# require(RColorBrewer)
-# library(data.table)
-############################################################
-############################################################
-# install.packages("htmltools")
-# library(htmltools)
-# source("https://bioconductor.org/biocLite.R")
-# biocLite("DESeq2")
-# 
-# library( "DESeq2" )
-# library(ggplot2)
-############################################################
 ############################################################
 
-#DESeq2 Script:
-# This script is designed for 2 zoospore replicates and 15 mat replicates.
-# Double check counts data and coldata have the appropriate columns/rows
 
 ###
 #Import files
@@ -52,6 +30,7 @@ setwd('../')
 setwd('temp')
 # Read counts data from file
 cts = read.delim("counts_RNAseq_updated.csv", header=TRUE, sep=",")
+
 
 ###
 #Format counts and metadata
@@ -74,6 +53,7 @@ coldata$condition <- factor(coldata$condition, levels = c('zoosp','mat'))
 if (all(rownames(coldata) != colnames(cts))) {
   print("The rownames of coldata do not match the columns of cts")
 }
+
 
 ###
 #Run DESeq2
@@ -102,7 +82,6 @@ colnames(res)[colnames(res) == 'padj'] <- 'mat_vs_zoosp_Padj'
 #Export results
 ###
 # Deposit results in temp folder
-
 # Export results file to .csv for data analysis in Python script
 write.csv(res,"deseq2_output.csv", row.names = FALSE)
 
