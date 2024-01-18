@@ -1,5 +1,5 @@
 """
-Zoospore RNA Manuscript: RNA Data Analysis for Specific Annotations, Step 2
+Zoospore RNA Manuscript: RNA Data Analysis for Specific Annotations
 
 @author: Lazarina Butkovich
 """

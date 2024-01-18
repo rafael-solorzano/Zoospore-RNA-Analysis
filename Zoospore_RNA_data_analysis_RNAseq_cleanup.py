@@ -76,7 +76,7 @@ def remove_proteinIDs_with_duplicate_aa_seqs(counts, dupes, prefix, index_id):
 Values
 """ 
 input_folder = r'input' 
-temp_output_folder = r'temp_output'
+temp_folder = r'temp'
 
 # Input filenames
 deflines_in_filename = 'Neosp1_FilteredModels5_deflines_pre.fasta'
@@ -89,8 +89,8 @@ counts_id_col_name = 'GeneID'
 
 # Output filenames
 deflines_out_filename = 'Neosp1_FilteredModels5_deflines_post.fasta'
-counts_out_filename = 'counts_RNAseq_updated.xlsx'
-tpm_counts_out_filename = 'tpm_counts_RNAseq_updated.xlsx'
+counts_out_filename = 'counts_RNAseq_updated.csv'
+tpm_counts_out_filename = 'tpm_counts_RNAseq_updated.csv'
 duped_values_out_filename = 'Neosp1_FilteredModels5_deflines_duped_proteinIDs_sorted.fasta'
 
 
@@ -147,24 +147,23 @@ tpm_counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_val
 """
 Output files
 """
-# Create temp_output folder if it doesn't exist
-if not os.path.exists(temp_output_folder):
-    os.makedirs(temp_output_folder)
+# Create temp folder if it doesn't exist
+if not os.path.exists(temp_folder):
+    os.makedirs(temp_folder)
 
 # Write FASTA file with consolidated proteinIDs
-fastA_file = open(pjoin(*[temp_output_folder, deflines_out_filename]), 'w') 
+fastA_file = open(pjoin(*[temp_folder, deflines_out_filename]), 'w') 
 for k,v in new_parsed_seqs.items():
     fastA_file.write(f">{k}\n{v}\n")
 fastA_file.close()
 
 # Write duped_values_sorted dictionary to file
-f2 = open(pjoin(*[temp_output_folder, duped_values_out_filename]),'w')
+f2 = open(pjoin(*[temp_folder, duped_values_out_filename]),'w')
 for k,v in duped_values_sorted.items():
     f2.write(f"{k}: {v}\n")
 f2.close()
 
-# Write counts file with consolidated proteinIDs
-counts.to_excel(pjoin(*[temp_output_folder, counts_out_filename]),',')
-
-# Write TPM counts file with consolidated proteinIDs
-tpm_counts.to_excel(pjoin(*[temp_output_folder, tpm_counts_out_filename]),',')
+# Write counts csv file with consolidated proteinIDs
+counts.to_csv(pjoin(*[temp_folder, counts_out_filename]),',')
+# Write TPM csv counts file with consolidated proteinIDs
+tpm_counts.to_csv(pjoin(*[temp_folder, tpm_counts_out_filename]),',')

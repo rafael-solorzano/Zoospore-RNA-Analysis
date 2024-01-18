@@ -160,5 +160,5 @@ cython_debug/
 #.idea/
 
 output/
-temp_output/
+temp/
 input_backup/
