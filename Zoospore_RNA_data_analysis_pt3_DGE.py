@@ -62,7 +62,6 @@ def make_proteinID_annot_dict(pd_annot, annot_col):
             proteinID_annot_dict[proteinID] = [annot]
     for key in proteinID_annot_dict:
         if len(proteinID_annot_dict[key]) > 1:
-            # print(proteinID_annot_dict[key])
             vals = list(map(str, proteinID_annot_dict[key]))
             proteinID_annot_dict[key] = ",".join(vals)
         else:
@@ -106,7 +105,6 @@ def add_to_df(df, X_annot_pd, annot_cols_list, shared_col='proteinID'):
     # Add annotations to df
     annot_col_num = 0
     for annot_dict in X_dicts_list:
-        # print(annot_dict)
         df[annot_cols_list[annot_col_num]] = df[shared_col].map(annot_dict)
         annot_col_num += 1
 
@@ -577,9 +575,6 @@ counts['zoosp_counts_avg'] = zoosp_counts_avg
 # Align counts dataframe with DGE_summary dataframe based on proteinID
 DGE_summary = DGE_summary.merge(counts[['proteinID', 'mat_counts_avg', 'zoosp_counts_avg']], on='proteinID', how='left')
 
-# Print duplicate rows in counts
-print('Duplicate rows in counts: ', counts[counts.duplicated(['proteinID'], keep=False)])
-
 
 """
 TPM Counts
@@ -826,10 +821,8 @@ pirfi3_source_orthologs = []
 index_Ortho = []
 source_orthogroups = []
 for source_gene in proteinIDs_Ortho_format:
-    # print(source_gene)
     for ortho_description in GF_ortholog_search:
         index = 0
-        # print(ortho_description)
         filled = 0
         # if ortho_description is not NaN:
         if isinstance(ortho_description, str):
@@ -1042,7 +1035,7 @@ KOG Fisher Exact tests
 """
 Fisher_KOG_zoosp_upreg_unfiltered, Fisher_KOG_mat_upreg_unfiltered = fisher_start(annot_KOG_defline_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
-print('Finished running Fisher exact tests for KOG annotations, took %.2f seconds' % ((time.time() - start)))
+print('Finished running Fisher\'s Exact Tests for KOG annotations, took %.2f seconds' % ((time.time() - start)))
 start = time.time()
 
 """
@@ -1050,7 +1043,7 @@ GO Fisher Exact tests
 """
 Fisher_GO_zoosp_upreg_unfiltered, Fisher_GO_mat_upreg_unfiltered = fisher_start(annot_GO_name_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
-print('Finished running Fisher exact tests for GO annotations, took %.2f seconds' % ((time.time() - start)))
+print('Finished running Fisher\'s Exact Tests for GO annotations, took %.2f seconds' % ((time.time() - start)))
 start = time.time()
 
 """
@@ -1058,14 +1051,14 @@ IPR Fisher Exact tests
 """
 Fisher_IPR_zoosp_upreg_unfiltered, Fisher_IPR_mat_upreg_unfiltered = fisher_start(annot_IPR_desc_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
-print('Finished running Fisher exact tests for IPR annotations, took %.2f seconds' % ((time.time() - start)))
+print('Finished running Fisher\'s Exact Tests for IPR annotations, took %.2f seconds' % ((time.time() - start)))
 start = time.time()
 """
 KEGG Fisher Exact tests
 """
 Fisher_KEGG_zoosp_upreg_unfiltered, Fisher_KEGG_mat_upreg_unfiltered = fisher_start(annot_KEGG_desc_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
-print('Finished running Fisher exact tests for KEGG annotations, took %.2f seconds' % ((time.time() - start)))
+print('Finished running Fisher\'s Exact Tests for KEGG annotations, took %.2f seconds' % ((time.time() - start)))
 start = time.time()
 
 """
@@ -1073,14 +1066,14 @@ KEGG Pathway Fisher Exact tests
 """
 Fisher_KEGG_pathway_zoosp_upreg_unfiltered, Fisher_KEGG_pathway_mat_upreg_unfiltered = fisher_start(annot_KEGG_pathway_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
-print('Finished running Fisher exact tests for KEGG pathway annotations, took %.2f seconds' % ((time.time() - start)))
+print('Finished running Fisher\'s Exact Tests for KEGG pathway annotations, took %.2f seconds' % ((time.time() - start)))
 
 """
 KEGG Pathway Class Fisher Exact tests
 """
 Fisher_KEGG_pathway_class_zoosp_upreg_unfiltered, Fisher_KEGG_pathway_class_mat_upreg_unfiltered = fisher_start(annot_KEGG_pathway_class_pd, num_genes_upreg_zoosp, num_genes_upreg_mat, num_genes_total)
 
-print('Finished running Fisher exact tests for KEGG pathway class annotations, took %.2f seconds' % ((time.time() - start)))
+print('Finished running Fisher\'s Exact Tests for KEGG pathway class annotations, took %.2f seconds' % ((time.time() - start)))
 
 """
 CAZyme Fisher Exact tests
@@ -1096,7 +1089,7 @@ Fisher_key_CAZyme_classes_zoosp_upreg, Fisher_key_CAZyme_classes_mat_upreg = fis
 Fisher_key_CAZyme_classes_zoosp_upreg.sort_values(by=['Fisher_p-value'])
 Fisher_key_CAZyme_classes_mat_upreg.sort_values(by=['Fisher_p-value'])
 
-print('Finished running Fisher exact tests for CAZyme annotations, took %.2f seconds' % ((time.time() - start)))
+print('Finished running Fisher\'s Exact Tests for CAZyme annotations, took %.2f seconds' % ((time.time() - start)))
 start = time.time()
 
 
