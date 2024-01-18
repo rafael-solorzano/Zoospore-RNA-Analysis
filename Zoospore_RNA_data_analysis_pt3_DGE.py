@@ -498,14 +498,14 @@ cellulosome_annot_filename = "F5-7proteomics_results_valuesOnly_cellulosomesOnly
 
 # Inputs from Previous Scripts (deposited in temp folder)
 # 1) Zoospore vs fungal mat DESeq2 data:
-deseq2_filename = "deseq2_output_20230315.csv"
+deseq2_filename = "deseq2_output.csv"
     # From my DESeq2 analysis in RStudio
     # Columns: proteinID, baseMean, mat_vs_zoosp_log2FC, lfcSE, stat, pvalue, mat_vs_zoosp_Padj
     # R v4.2.2
     # Bioconductor v3.16
     # DESeq2 v1.36.0
 # 2) DESeq2 Normalized counts:
-deseq2_norm_counts_filename = "deseq2_normalized_counts_labeled_20230315.csv"
+deseq2_norm_counts_filename = "deseq2_normalized_counts_labeled.csv"
     # Columns: proteinID, ~all sample names~,zoosp_avg_DESeq2_norm_cts, mat_avg_DESeq2_norm_cts, zoosp_var_DESeq2_norm_cts, mat_var_DESeq2_norm_cts, log2FC_check
 # 3) Counts:
 counts_filename = "counts_RNAseq_updated.csv"
