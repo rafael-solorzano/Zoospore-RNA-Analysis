@@ -12,7 +12,9 @@ import pandas as pd
 import os
 from os.path import join as pjoin
 
-# Functions
+"""
+Functions
+"""
 def parse_fasta_file(f):
     """
     Parses a fasta file into a dictionary of 'proteinID':'amino acid sequence'
@@ -89,7 +91,7 @@ counts_id_col_name = 'GeneID'
 deflines_out_filename = 'Neosp1_FilteredModels5_deflines_post.fasta'
 counts_out_filename = 'counts_RNAseq_updated.xlsx'
 tpm_counts_out_filename = 'tpm_counts_RNAseq_updated.xlsx'
-duped_values_out_filename = 'Neosp1_FilteredModels5_deflines_duped_proteinIDs_sorted'
+duped_values_out_filename = 'Neosp1_FilteredModels5_deflines_duped_proteinIDs_sorted.fasta'
 
 
 """
@@ -136,6 +138,13 @@ for key,value in duped_values.items():
 
 
 """
+Consolidate counts and TPM counts data for proteinIDs with identical amino acid sequences
+"""
+counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_values_sorted, fasta_prefix, counts_id_col_name)            
+tpm_counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_values_sorted, fasta_prefix, counts_id_col_name)            
+
+
+"""
 Output files
 """
 # Create temp_output folder if it doesn't exist
@@ -155,9 +164,7 @@ for k,v in duped_values_sorted.items():
 f2.close()
 
 # Write counts file with consolidated proteinIDs
-counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_values_sorted, fasta_prefix, counts_id_col_name)            
 counts.to_excel(pjoin(*[temp_output_folder, counts_out_filename]),',')
 
 # Write TPM counts file with consolidated proteinIDs
-tpm_counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_values_sorted, fasta_prefix, counts_id_col_name)            
 tpm_counts.to_excel(pjoin(*[temp_output_folder, tpm_counts_out_filename]),',')

@@ -23,6 +23,13 @@ Note, raw RNA-Seq reads are available at NCBI BioProject: PRJNA982907 to PRJNA98
 Transcripts-per-million normalization is considered in this study.
 
 Outputs to temp_outputs:
+counts_RNAseq_updated.xlsx
+Neosp1_FilteredModels5_deflines_duped_proteinIDs_sorted.fasta
+Neosp1_FilteredModels5_deflines_post.fasta
+tpm_counts_RNAseq_updated
+
+
+Part 0: DESeq2 in R
 
 
 
