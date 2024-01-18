@@ -147,6 +147,10 @@ tpm_counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_val
 """
 Output files
 """
+# Manual analysis of the replicates using Pearson Correlation Coefficients shows that zoospore replicate HHCCZ is an outlier. For the purposes of this analysis, we will remove this replicate from the counts and TPM counts dataframes.
+counts = counts.drop(['HHCCZ'], axis=1)
+tpm_counts = tpm_counts.drop(['HHCCZ'], axis=1)
+
 # Create temp folder if it doesn't exist
 if not os.path.exists(temp_folder):
     os.makedirs(temp_folder)
