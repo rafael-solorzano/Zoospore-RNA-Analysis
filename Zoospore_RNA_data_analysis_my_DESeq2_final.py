@@ -23,9 +23,25 @@ This script is designed to analyze the RNA-seq data for N. californiae zoospore 
 """
 File names for import
 """
+# Manually Added Inputs: 
+# 1) Downloaded MycoCosm Annotations: 
+    # Multiple annotation files:
+KOG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KOG.tsv"
+GO_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_GO.tsv"
+IPR_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_IPR.tsv"
+KEGG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KEGG.tsv"
+# Additional MycoCosm Annotations:
+# 2) Secondary metabolites:
+SM_annot_filename = "Neosp1_SMs_orthologs_20221024.xlsx"
+# 3) OrthoFinder data:
+Orthologs_filename = "Orthogroups_GF_20220921.tsv"
+# 4) CAZymes with selected dbCAN2 predictions:
+CAZyme_annot_filename = "G1_cazymes_with_dbCAN2.csv"
+# 5) Cellulosome-associated proteinIDs:
+cellulosome_annot_filename = "F5-7proteomics_results_valuesOnly_cellulosomesOnly.csv"
 
-# Inputs: 
 
+# Inputs from Previous Scripts (deposited in temp folder)
 # 1) Zoospore vs fungal mat DESeq2 data:
 deseq2_filename = "deseq2_output_20230315.csv"
     # From my DESeq2 analysis in RStudio
@@ -39,31 +55,13 @@ deseq2_norm_counts_filename = "deseq2_normalized_counts_labeled_20230315.csv"
     # Columns: proteinID, ~all sample names~,zoosp_avg_DESeq2_norm_cts, mat_avg_DESeq2_norm_cts, zoosp_var_DESeq2_norm_cts, mat_var_DESeq2_norm_cts, log2FC_check
 
 # 3) Counts:
-counts_filename = "updated_counts.csv"
-    # From "Zoospore_data_cleanup_pipeline.py", where I consolidated read counts for proteinIDs with identical amino acid sequences, such that a single proteinID would be associated with the counts for all of the proteinIDs with identical amino acid sequences.
-
-# 4) TPM Counts:
-tpm_filename = "tpm_counts_updated_sorted.xlsx" 
+counts_filename = "counts_RNAseq_updated.csv"
     # From "Zoospore_data_cleanup_pipeline.py"
 
-# 5) Downloaded Mycocosm Annotations: 
-    # Multiple annotation files:
-KOG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KOG.tsv"
-GO_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_GO.tsv"
-IPR_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_IPR.tsv"
-KEGG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KEGG.tsv"
+# 4) TPM Counts:
+tpm_filename = "tpm_counts_RNAseq_updated.csv" 
+    # From "Zoospore_data_cleanup_pipeline.py"
 
-# Additional Mycocosm Annotations:
-# 6) Secondary metabolites:
-SM_annot_filename = "Neosp1_SMs_orthologs_20221024.xlsx"
-# 7) OrthoFinder data:
-# Use Align_DGE_Summary_with_orthologs.py script after this script
-# 8) CAZymes with selected dbCAN2 predictions:
-CAZyme_annot_filename = "G1_cazymes_with_dbCAN2.csv"
-# 9) Cellulosome-associated proteinIDs:
-cellulosome_annot_filename = "F5-7proteomics_results_valuesOnly_cellulosomesOnly.csv"
-# 10) Orthofinder data
-Orthologs_filename = "Orthogroups_GF_20220921.tsv"
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Functions
@@ -506,7 +504,8 @@ def return_class_stats(df, col, keyword, zoosp_upreg_col="zoosp_upreg",mat_upreg
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Changeable values    **************************************
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-input_folder = r'input' 
+input_folder = r'input'
+temp_folder = r'temp' 
 output_folder = r'output'
 # RNA sample groupings
 mat_samples = ["HHCCW", "HHCCX", "HHCCY", "HHCGA", "HHCGB", "HHCGG", "HHCGH", "HHCGN", "HHCGO", "HHCGP", "HHCGT", "HHCGU", "HHCGW", "HHCGX", "HHCGY"]
@@ -527,10 +526,10 @@ if not os.path.exists(output_folder):
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Import files
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-deseq2 = pd.read_csv(pjoin(*[input_folder, deseq2_filename]), sep=',')
-deseq2_cts = pd.read_csv(pjoin(*[input_folder, deseq2_norm_counts_filename]), sep=',')
-counts = pd.read_csv(pjoin(*[input_folder, counts_filename]), sep=',')
-tpm = pd.read_excel(pjoin(*[input_folder, tpm_filename]), sheet_name='Sheet1')
+deseq2 = pd.read_csv(pjoin(*[temp_folder, deseq2_filename]), sep=',')
+deseq2_cts = pd.read_csv(pjoin(*[temp_folder, deseq2_norm_counts_filename]), sep=',')
+counts = pd.read_csv(pjoin(*[temp_folder, counts_filename]), sep=',')
+tpm = pd.read_excel(pjoin(*[temp_folder, tpm_filename]), sheet_name='Sheet1')
 KOG_annot = pd.read_csv(pjoin(*[input_folder, KOG_annot_filename]), sep='\t')
 GO_annot = pd.read_csv(pjoin(*[input_folder, GO_annot_filename]), sep='\t')
 IPR_annot = pd.read_csv(pjoin(*[input_folder, IPR_annot_filename]), sep='\t')
@@ -570,6 +569,7 @@ DGE_summary = DGE_summary.sort_values(by=['proteinID'])
 # reset index
 DGE_summary = DGE_summary.reset_index(drop=True)
 
+
 """
 Counts
 """
@@ -587,11 +587,9 @@ counts['zoosp_counts_avg'] = zoosp_counts_avg
 # Align counts dataframe with DGE_summary dataframe based on proteinID
 DGE_summary = DGE_summary.merge(counts[['proteinID', 'mat_counts_avg', 'zoosp_counts_avg']], on='proteinID', how='left')
 
-# # Print how many rows in counts have value of 0 for mat_counts_avg AND 0 for zoosp_counts_avg
-# print('Number of rows in counts with value of 0 for mat_counts_avg AND 0 for zoosp_counts_avg: ', len(counts[(counts['mat_counts_avg'] == 0) & (counts['zoosp_counts_avg'] == 0)]))
-
 # Print duplicate rows in counts
 print('Duplicate rows in counts: ', counts[counts.duplicated(['proteinID'], keep=False)])
+
 
 """
 TPM Counts
@@ -610,6 +608,7 @@ tpm['zoosp_tpm_avg'] = zoosp_tpm_avg
 # Align tpm dataframe with DGE_summary dataframe based on proteinID
 DGE_summary = DGE_summary.merge(tpm[['proteinID', 'mat_tpm_avg', 'zoosp_tpm_avg']], on='proteinID', how='left')
 
+
 """
 DESeq2-normalized counts
 """
@@ -623,6 +622,7 @@ deseq2_cts = deseq2_cts.reset_index(drop=True)
 DGE_summary['mat_avg_DESeq2_normalized_cts'] = deseq2_cts[['mat_avg_DESeq2_norm_cts']]
 DGE_summary['zoosp_avg_DESeq2_normalized_cts'] = deseq2_cts[['zoosp_avg_DESeq2_norm_cts']]
 
+
 """
 DGE info
 """
@@ -630,6 +630,7 @@ DGE info
 # Note that log2FC < 0 means that the proteinID is upregulated in zoospores
 DGE_summary['mat_upreg'] = np.where((DGE_summary['log2FC'] > log2FC_cutoff) & (DGE_summary['padj'] < pval_cutoff) & (DGE_summary['mat_tpm_avg'] > tpm_cutoff), 1, 0)
 DGE_summary['zoosp_upreg'] = np.where((DGE_summary['log2FC'] < -log2FC_cutoff) & (DGE_summary['padj'] < pval_cutoff) & (DGE_summary['zoosp_tpm_avg'] > tpm_cutoff), 1, 0)
+
 
 """
 Export this basic DGE summary
@@ -645,6 +646,7 @@ DGE_summary.to_excel(writer, sheet_name='DGE_summary',index=False)
 # Close the Pandas Excel writer and output the Excel file.
 # 10/12/23 note: .save() may give an error; use close() instead, since .save() is deprecated
 writer.close()
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Align dataframes for DGE_Summary cont'd: Annotations
@@ -670,6 +672,7 @@ KOG_dup_proteinIDs = check_proteinIDs_with_multiple_annotations(KOG_annot, 'KOG_
 
 DGE_summary = add_to_df(DGE_summary, KOG_annot, ['KOG_id', 'KOG_defline', 'KOG_class', 'KOG_group'])
 
+
 """
 GO terms
 """
@@ -691,6 +694,7 @@ GO_dup_proteinIDs = check_proteinIDs_with_multiple_annotations(GO_annot, 'GO_nam
 
 DGE_summary = add_to_df(DGE_summary, GO_annot, ['GO_id', 'GO_name', 'GO_type', 'GO_acc'])
 
+
 """
 IPR (InterPro) annotations
 """
@@ -708,6 +712,7 @@ IPR_annot = IPR_annot.drop_duplicates()
 IPR_annot = IPR_annot.rename(columns={'iprId': 'IPR_id', 'iprDesc': 'IPR_desc', 'domainDb': 'domain_db', 'domainId': 'domain_id', 'domainDesc': 'domain_desc', 'numHits': 'num_hits', 'score': 'IPR_score'})
 
 DGE_summary = add_to_df(DGE_summary, IPR_annot, ['IPR_id', 'IPR_desc', 'domain_db', 'domain_id', 'domain_desc', 'num_hits', 'IPR_score'])
+
 
 """
 KEGG annotations
@@ -727,6 +732,7 @@ KEGG_annot = KEGG_annot.rename(columns={'ecNum': 'KEGG_ecNum', 'definition': 'KE
 
 DGE_summary = add_to_df(DGE_summary, KEGG_annot, ['KEGG_ecNum', 'KEGG_definition', 'KEGG_catalyticActivity', 'KEGG_pathway', 'KEGG_pathway_class', 'KEGG_pathway_type'])
 
+
 """
 CAZymes
 """
@@ -741,6 +747,7 @@ CAZyme_annot = CAZyme_annot.drop_duplicates()
 CAZyme_annot = CAZyme_annot.rename(columns={'description': 'CAZyme_description', 'modelnotes': 'CAZyme_modelnotes', 'defline': 'CAZyme_defline'})
 
 DGE_summary = add_to_df(DGE_summary, CAZyme_annot, ['CAZyme_description', 'CAZyme_modelnotes', 'CAZyme_defline'])
+
 
 """
 Secondary Metabolites (SMs)
@@ -1183,7 +1190,7 @@ stat_value+=[num_genes_total_IPR]
 stat_description+=['Number of proteinIDs with KEGG annotations']
 stat_value+=[num_genes_total_KEGG]
 
-stat_description+=['Number of proteinIDs with Mycocosm CAZyme annotations']
+stat_description+=['Number of proteinIDs with MycoCosm CAZyme annotations']
 stat_value+=[num_genes_total_CAZyme]
 
 stat_description+=['Total number of proteinIDs upregulated in zoospores']
