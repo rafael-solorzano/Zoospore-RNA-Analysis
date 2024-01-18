@@ -9,6 +9,23 @@ Part 3: Define additional CAZyme and cellulosome gene annotations
 
 
 
+Part -1: Clean up raw RNAseq data
+
+Required Inputs:
+1) FASTA file for genes in Neocallimastix californiae G1 genome,'Neosp1_FilteredModels5_deflines_pre.fasta'
+Downloaded from JGI Mycocosm, under Annotation --> Filtered Models ("best") --> Genes --> "Neosp1_FilteredModels5_deflines.gff.gz" for Project 1029446, 20171122.
+The FASTA lists gene keys, identified by Mycocosm proteinID, followed by amino acid sequences
+
+2) counts_in_filename = 'counts_RNAseq_original.txt'
+Note, raw RNA-Seq reads are available at NCBI BioProject: PRJNA982907 to PRJNA982924 
+
+3) tpm_counts_in_filename = 'tpm_counts_RNAseq_original.txt'
+Transcripts-per-million normalization is considered in this study.
+
+Outputs to temp_outputs:
+
+
+
 
 Script: "Zoospore_RNA_data_analysis_pt1_DESeq2.py"
 

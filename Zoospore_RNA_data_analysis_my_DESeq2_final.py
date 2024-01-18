@@ -1,5 +1,5 @@
 """
-Zoospore RNA Manuscript: RNA Data Analysis, Step 1
+Zoospore RNA Manuscript: RNA Data Analysis DESeq2
 
 @author: Lazarina Butkovich
 """
@@ -16,11 +16,6 @@ start = time.time()
 Script description
 
 This script is designed to analyze the RNA-seq data for N. californiae zoospore vs fungal mat samples. 
-
-# Order of scripts to run:
-- this script (Zoospore_RNA_data_analysis_my_DESeq2_final.py)
-- Zoospore_RNA_format_data_final.py
-- Zoospore_RNA_data_analysis_CAZymes_final.py
 
 """
 # Goal: transcriptomic data analysis for N. californiae zoospore vs fungal mat RNA-seq data.

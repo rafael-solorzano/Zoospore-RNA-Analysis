@@ -1,5 +1,5 @@
 """
-Zoospore RNA Manuscript: RNA Data Analysis for CAZyme and Cellulosome Annotations, Step 3
+Zoospore RNA Manuscript: RNA Data Analysis for CAZyme and Cellulosome Annotations
 
 @author: Lazarina Butkovich
 """

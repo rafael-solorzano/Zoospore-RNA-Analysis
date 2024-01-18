@@ -7,8 +7,6 @@ Features include:
     Modified proteinIDs FASTA with removal of genes with duplicate amino acid sequence
     Consolidation of counts for dupes
     Consolidation of TPM counts for dupes
-    Generation of FASTA list of DE'd, unannotated (KOG) genes for OmicsBox Cloud BLAST
-
 """
 import pandas as pd
 import os
