@@ -488,13 +488,13 @@ IPR_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_IPR.tsv"
 KEGG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KEGG.tsv"
 # Additional MycoCosm Annotations:
 # 2) Secondary metabolites:
-SM_annot_filename = "Neosp1_SMs_orthologs_20221024.xlsx"
+SM_annot_filename = "Neosp1_SMs_orthologs.xlsx"
 # 3) OrthoFinder data:
-Orthologs_filename = "Orthogroups_GF_20220921.tsv"
+Orthologs_filename = "Orthogroups_GF.tsv"
 # 4) CAZymes with selected dbCAN2 predictions:
 CAZyme_annot_filename = "G1_cazymes_with_dbCAN2.csv"
 # 5) Cellulosome-associated proteinIDs:
-cellulosome_annot_filename = "F5-7proteomics_results_valuesOnly_cellulosomesOnly.csv"
+cellulosome_annot_filename = "G1_cellulosomes_proteomics.csv"
 
 # Inputs from Previous Scripts (deposited in temp folder)
 # 1) Zoospore vs fungal mat DESeq2 data:
@@ -521,7 +521,7 @@ Import files
 deseq2 = pd.read_csv(pjoin(*[temp_folder, deseq2_filename]), sep=',')
 deseq2_cts = pd.read_csv(pjoin(*[temp_folder, deseq2_norm_counts_filename]), sep=',')
 counts = pd.read_csv(pjoin(*[temp_folder, counts_filename]), sep=',')
-tpm = pd.read_excel(pjoin(*[temp_folder, tpm_filename]), sheet_name='Sheet1')
+tpm = pd.read_csv(pjoin(*[temp_folder, tpm_filename]), sep=',')
 KOG_annot = pd.read_csv(pjoin(*[input_folder, KOG_annot_filename]), sep='\t')
 GO_annot = pd.read_csv(pjoin(*[input_folder, GO_annot_filename]), sep='\t')
 IPR_annot = pd.read_csv(pjoin(*[input_folder, IPR_annot_filename]), sep='\t')
@@ -537,9 +537,7 @@ Align dataframes for DGE_Summary
 """
 Initialize DGE_summary dataframe
 """
-# add proteinID column (number values after 2nd "|" in proteinID_str)
-# deseq2['proteinID'] = deseq2['proteinID_str'].str.split('|').str[2]
-# Make number values int or float64 (for decimals, use ~double)
+# Make proteinID values int or float64 (for decimals, use ~double)
 deseq2['proteinID'] = deseq2['proteinID'].astype(int)
 deseq2 = deseq2.sort_values(by=['proteinID'])
 # Some cond_1v2_log2FC values are "NA" (not a number), so I need to convert them to NaN
@@ -565,8 +563,8 @@ DGE_summary = DGE_summary.reset_index(drop=True)
 """
 Counts
 """
-# Make proteinID column by taking number values after 2nd "|" in proteinID_str
-counts['proteinID'] = counts['proteinID_str'].str.split('|').str[2]
+# Make proteinID column by taking number values after 2nd "|" in GeneID
+counts['proteinID'] = counts['GeneID'].str.split('|').str[2]
 # Make proteinID column into int
 counts['proteinID'] = counts['proteinID'].astype(int)
 # Sort counts by proteinID number
@@ -586,8 +584,8 @@ print('Duplicate rows in counts: ', counts[counts.duplicated(['proteinID'], keep
 """
 TPM Counts
 """
-# Make proteinID column by taking number values after 2nd "|" in proteinID_str
-tpm['proteinID'] = tpm['proteinID_str'].str.split('|').str[2]
+# Make proteinID column by taking number values after 2nd "|" in GeneID
+tpm['proteinID'] = tpm['GeneID'].str.split('|').str[2]
 # Make proteinID column into int
 tpm['proteinID'] = tpm['proteinID'].astype(int)
 # Sort tpm by proteinID number
@@ -1242,7 +1240,7 @@ Export files
 """
 Output Statistics and Data Tables
 """
-filename_out = "DGE_statistics_and_data_tables.xlsx"
+filename_out = "DGE_Statistics_and_Data_Tables.xlsx"
 file_path_out = pjoin(*[output_folder, filename_out])
 
 writer = pd.ExcelWriter(file_path_out, engine='xlsxwriter')
@@ -1257,8 +1255,34 @@ writer.close()
 """
 Write each dataframe to a different sheet in output excel
 """
-filename_out = "DGE_summary_output.xlsx"
+filename_out = "DGE_Summary_Fisher_main_annotations.xlsx"
 file_path_out = pjoin(*[output_folder, filename_out])
+
+# https://xlsxwriter.readthedocs.io/example_pandas_multiple.html
+writer = pd.ExcelWriter(file_path_out, engine='xlsxwriter')
+
+# Write each dataframe to a different sheet (with no index column)
+DGE_summary.to_excel(writer, sheet_name='DGE_summary',index=False)
+Fisher_KOG_zoosp_upreg.to_excel(writer, sheet_name='Fisher_KOG_zoosp_upreg',index=True)
+Fisher_KOG_mat_upreg.to_excel(writer, sheet_name='Fisher_KOG_mat_upreg',index=True)
+Fisher_GO_zoosp_upreg.to_excel(writer, sheet_name='Fisher_GO_zoosp_upreg',index=True)
+Fisher_GO_mat_upreg.to_excel(writer, sheet_name='Fisher_GO_mat_upreg',index=True)
+Fisher_IPR_zoosp_upreg.to_excel(writer, sheet_name='Fisher_IPR_zoosp_upreg',index=True)
+Fisher_IPR_mat_upreg.to_excel(writer, sheet_name='Fisher_IPR_mat_upreg',index=True)
+Fisher_KEGG_zoosp_upreg.to_excel(writer, sheet_name='Fisher_KEGG_zoosp_upreg',index=True)
+Fisher_KEGG_mat_upreg.to_excel(writer, sheet_name='Fisher_KEGG_mat_upreg',index=True)
+Fisher_KEGG_pathway_zoosp_upreg.to_excel(writer, sheet_name='Fisher_KEGG_pathway_zoosp_upreg',index=True)
+Fisher_KEGG_pathway_mat_upreg.to_excel(writer, sheet_name='Fisher_KEGG_pathway_mat_upreg',index=True)
+Fisher_KEGG_pathway_class_zoosp_upreg.to_excel(writer, sheet_name='Fisher_KEGG_pathclass_z_upreg',index=True)
+Fisher_KEGG_pathway_class_mat_upreg.to_excel(writer, sheet_name='Fisher_KEGG_pathclass_m_upreg',index=True)
+Fisher_CAZyme_zoosp_upreg.to_excel(writer, sheet_name='Fisher_CAZyme_zoosp_upreg',index=True)
+Fisher_CAZyme_mat_upreg.to_excel(writer, sheet_name='Fisher_CAZyme_mat_upreg',index=True)
+
+# Close the Pandas Excel writer and output the Excel file.
+writer.close()
+
+# Also write DGE_summary_output to the temp folder, for access to downstream scripts (copy-pasted above section and changed output_folder to temp_folder)
+file_path_out = pjoin(*[temp_folder, filename_out])
 
 # https://xlsxwriter.readthedocs.io/example_pandas_multiple.html
 writer = pd.ExcelWriter(file_path_out, engine='xlsxwriter')
@@ -1287,7 +1311,7 @@ writer.close()
 """
 Output CAZymes defline table
 """
-filename_out = "CAZymes_defline_output.xlsx"
+filename_out = "DGE_Summary_CAZymes_output.xlsx"
 file_path_out = pjoin(*[output_folder, filename_out])
 
 # First, output annot_CAZyme_defline_pd sorted by proteinIDs count descending
@@ -1325,8 +1349,8 @@ writer.close()
 """
 Output All Annot Pd dataframes
 """
-filename_out = "All_annot_PDs.xlsx"
-file_path_out = pjoin(*[output_folder, filename_out])
+filename_out = "All_annotation_dataframes.xlsx"
+file_path_out = pjoin(*[temp_folder, filename_out])
 
 writer = pd.ExcelWriter(file_path_out, engine='xlsxwriter')
 
