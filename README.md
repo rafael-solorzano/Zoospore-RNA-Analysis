@@ -1,11 +1,15 @@
 # Zoospore-RNA-Analysis
 
 Outline:
-Part 1: "Zoospore_RNA_data_analysis_pt1_DESeq2.py"
-Part 2: "Zoospore_RNA_data_analysis_pt2_Format.py"
-Part 3: "Zoospore_RNA_data_analysis_pt3_CAZymes.py"
+Part -1: Clean up raw RNAseq data
+Part 0: Perform differential gene expression (DGE) analysis of raw RNAseq data using DESeq2 in R
+Part 1: Process DESeq2 data and define KOG, GO, IPR, KEGG gene annotations
+Part 2: Format DESeq2 data, define additional gene annotations, and generate Fisher's Exact Statistics for DE of gene annotations
+Part 3: Define additional CAZyme and cellulosome gene annotations
 
-Part 1
+
+
+
 Script: "Zoospore_RNA_data_analysis_pt1_DESeq2.py"
 
 Required Inputs:
