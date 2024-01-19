@@ -223,15 +223,15 @@ output_folder = r'output'
 Inputs
 """
 # Manually Added Inputs:
-# 1) DGE Output Summary:
-DGE_summary_filename = "DGE_Summary_output_main.xlsx"
-
-# Inputs from Previous Scripts (deposited in temp folder)
 # 1) dbCAN2 CAZyme predictions:
 # dbCAN2 (https://doi.org/10.1093/nar/gky418) is a tool for annotating CAZYme annotations. I predominately used CAZYme annotations from JGI's Mycocosm, but you can also look at dbCAN2 CAZyme predicitons. This would be more helpful for annotating de novo transcripts from this dataset.
 # List dbCAN2 data filenames:
 dbCAN2_filenames = ['G1_part1_dbCAN_output','G1_part2_dbCAN_output','G1_part3_dbCAN_output','G1_part4_dbCAN_output','G1_part5_dbCAN_output','G1_part6_dbCAN_output']
 dbCAN2_file_ext = ".xlsx"
+
+# Inputs from Previous Scripts (deposited in temp folder)
+# 1) DGE Output Summary:
+DGE_summary_filename = "DGE_Summary_output_main.xlsx"
 
 # 2) Cellulosome proteomics data and annotations
 # In order to match proteomics data to the genes listed in DGE Summary, we need to compare sequences by BLASTp. This can be accomplished by running a local BLASTp of the proteomics data amino acid sequences against the amino acid sequences for the genes listed in DGE Summary, which can be downloaded from JGI MycoCosm. The BLASTp match cutoffs are as follows: e-value < 1E-5, percent identity > 90%, and “query coverage per HSP” > 75%. Ensure that the BLASTp results (imported here as 'cellulosomes_BLASTp_results.csv') have only one hit per gene and that there are no repeats of the same gene in the BLASTp results (remove duplicates).
@@ -284,8 +284,8 @@ if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 # Sheet with all proteinIDs from cellulosome_df
-name_out = 'DGE_summary_dbCAN2_and_cellulosomes'
-file_path_out = pjoin(*[output_folder, name_out + '.xlsx'])
+name_out = 'DGE_summary_dbCAN2_and_cellulosomes.xlsx'
+file_path_out = pjoin(*[output_folder, name_out])
 # https://xlsxwriter.readthedocs.io/example_pandas_multiple.html
 writer = pd.ExcelWriter(file_path_out, engine='xlsxwriter')
 

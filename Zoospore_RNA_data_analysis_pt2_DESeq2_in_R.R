@@ -1,6 +1,6 @@
 ############################################################
 
-# Zoospore RNA Manuscript: DESEQ2 Analysis in R by Lazarina Butkovich
+# Zoospore RNA Manuscript: DESeq2 Analysis in R by Lazarina Butkovich
 
 # https://lashlock.github.io/compbio/R_presentation.html
 # Citation for DESeq2: Love, M.I., Huber, W., Anders, S. (2014) Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15:550. 10.1186/s13059-014-0550-8

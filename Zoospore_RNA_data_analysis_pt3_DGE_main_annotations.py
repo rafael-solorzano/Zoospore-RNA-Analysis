@@ -1,5 +1,5 @@
 """
-Zoospore RNA Manuscript: RNA Data Analysis DESeq2
+Zoospore RNA Manuscript: Differential Gene Expression Analysis
 
 @author: Lazarina Butkovich
 """
