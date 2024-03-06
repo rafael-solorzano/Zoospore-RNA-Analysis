@@ -141,7 +141,7 @@ for key,value in duped_values.items():
 Consolidate counts and TPM counts data for proteinIDs with identical amino acid sequences
 """
 counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_values_sorted, fasta_prefix, counts_id_col_name)            
-tpm_counts = remove_proteinIDs_with_duplicate_aa_seqs(counts_original, duped_values_sorted, fasta_prefix, counts_id_col_name)            
+tpm_counts = remove_proteinIDs_with_duplicate_aa_seqs(tpm_counts_original, duped_values_sorted, fasta_prefix, counts_id_col_name)            
 
 
 """
