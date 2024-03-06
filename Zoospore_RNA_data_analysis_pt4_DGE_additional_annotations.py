@@ -6,6 +6,7 @@ Zoospore RNA Manuscript: RNA Data Analysis for Specific Annotations
 import os
 from os.path import join as pjoin
 import pandas as pd
+from bioinfokit import analys, visuz
 
 """
 This script is designed to analyze the DESeq2-processed RNA-seq data comparing N. californiae zoospore vs fungal mat samples, in order to perform differential gene expression analysis for specific gene annotations. This script can be modified to consider various annotations (ie: secondary metabolites, transcription factors, specific genes highlighted in published papers) that are not already readily encapsulated in the broad annotation categories (ie: KOG, GO, KEGG, IPR), or which need extra formatting.
@@ -195,9 +196,39 @@ SMs.sort_values('SM_cluster_id_num', ascending=True, na_position='last', kind='m
 # Core_SMs df (SMs with SM_core == True)
 Core_SMs = SMs[SMs['SM_core'] == True]
 
-# Create a volcano plot of only genes with SM annotations. One the x-axis, is log2fold change, and on the y-axis is -log10(padj).
+# Use Core_SMs pandas dataframe to create a volcano plot of only genes with SM annotations. One the x-axis, is log2fold change, and on the y-axis is -log10(padj).
+# Make a copy of Core_SMs called Core_SMs_volcano
+Core_SMs_volcano = Core_SMs.copy()
+# First, remove rows where padj is NaN. Also remove rows where log2FC is NaN.
+Core_SMs_volcano = Core_SMs_volcano[Core_SMs_volcano['padj'].notna()]
+Core_SMs_volcano = Core_SMs_volcano[Core_SMs_volcano['log2FC'].notna()]
 
+# Reset index
+Core_SMs_volcano = Core_SMs_volcano.reset_index(drop=True)
 
+# Make volcano plot
+# installed bioinfokit: https://github.com/reneshbedre/bioinfokit
+# about volcano plots: https://www.reneshbedre.com/blog/volcano.html
+
+# valpha = transparency of points
+# q = p_adjusted
+# When show=False, the plot gets saved as a .png image in the same folder as the script 
+# color for lightblue3: #9AC0CD
+# color for gray40: #666666
+# color for indianred3: #CD5555
+current_folder = os.getcwd()
+os.chdir(output_folder)
+# log2FC cutoff (absolute value)
+log2FC_cutoff = 1
+# p-value cutoff
+pval_cutoff = 0.05
+# Manually add in the geneid and genenames parameters for the data points you want to label on the volcano plot
+# visuz.GeneExpression.volcano(df=Core_SMs_volcano, lfc='log2FC', pv='padj', geneid="proteinID", genenames=({701295:"NRPS",704767:"PKS-like",407062:"PKS",502166:"PKS",454096:"PKS-like",28570:"PKS",677370:"PKS-like",390058:"PKS-like"}), show=False, plotlegend=True, legendpos='upper right', axtickfontname="Roboto", axlabelfontsize=12, axtickfontsize=12, legendanchor=(1.01, 1.01), color=["#9AC0CD","#666666","#CD5555"], valpha=0.5, axxlabel='log2-fold change', axylabel='-log10(q)', sign_line=True,legendlabels=['upregulated in mats','no significant regulation','upregulated in zoospores'],lfc_thr=(log2FC_cutoff,log2FC_cutoff),pv_thr=(pval_cutoff,pval_cutoff))
+
+# To label all differentially expression proteinID data points:
+visuz.GeneExpression.volcano(df=Core_SMs_volcano, lfc='log2FC', pv='padj', geneid="proteinID", genenames='deg', show=False, plotlegend=True, legendpos='upper right', axtickfontname="Roboto", axlabelfontsize=12, axtickfontsize=12, legendanchor=(1.01, 1.01), color=["#9AC0CD","#666666","#CD5555"], valpha=0.5, axxlabel='log2-fold change', axylabel='-log10(q)', sign_line=True,legendlabels=['upregulated in mats','no significant regulation','upregulated in zoospores'],lfc_thr=(log2FC_cutoff,log2FC_cutoff),pv_thr=(pval_cutoff,pval_cutoff))
+
+os.chdir(current_folder)
 
 """
 Formatting Hydrogenosomes excel
