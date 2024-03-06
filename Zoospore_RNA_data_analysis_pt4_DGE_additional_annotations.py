@@ -195,6 +195,10 @@ SMs.sort_values('SM_cluster_id_num', ascending=True, na_position='last', kind='m
 # Core_SMs df (SMs with SM_core == True)
 Core_SMs = SMs[SMs['SM_core'] == True]
 
+# Create a volcano plot of only genes with SM annotations. One the x-axis, is log2fold change, and on the y-axis is -log10(padj).
+
+
+
 """
 Formatting Hydrogenosomes excel
 """
