@@ -1223,7 +1223,7 @@ volcano_df = volcano_df.reset_index(drop=True)
 # color for indianred3: #CD5555
 current_folder = os.getcwd()
 os.chdir(output_folder)
-visuz.GeneExpression.volcano(df=volcano_df, lfc='log2FC', pv='padj', show=False, plotlegend=True, legendpos='upper right', axtickfontname="Roboto", axlabelfontsize=12, axtickfontsize=12, legendanchor=(1.01, 1.01), color=["#9AC0CD","#666666","#CD5555"], valpha=0.5, axxlabel='log2-fold change', axylabel='-log10(q)', sign_line=True,legendlabels=['upregulated in mats*','no significant regulation','upregulated in zoospores*'],lfc_thr=(log2FC_cutoff,log2FC_cutoff),pv_thr=(pval_cutoff,pval_cutoff))
+visuz.GeneExpression.volcano(df=volcano_df, lfc='log2FC', pv='padj', show=False, plotlegend=True, legendpos='upper right', axtickfontname="Roboto", axlabelfontsize=15, axtickfontsize=15, legendanchor=(1.01, 1.01), color=["#9AC0CD","#666666","#CD5555"], valpha=0.5, axxlabel='log2 fold-change', axylabel='-log10(q)', sign_line=True,legendlabels=['upregulated in mats*','no significant regulation','upregulated in zoospores*'],lfc_thr=(log2FC_cutoff,log2FC_cutoff),pv_thr=(pval_cutoff,pval_cutoff))
 os.chdir(current_folder)
 
 
