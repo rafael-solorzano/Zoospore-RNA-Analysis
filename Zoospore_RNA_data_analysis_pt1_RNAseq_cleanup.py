@@ -168,6 +168,6 @@ for k,v in duped_values_sorted.items():
 f2.close()
 
 # Write counts csv file with consolidated proteinIDs
-counts.to_csv(pjoin(*[temp_folder, counts_out_filename]),',')
+counts.to_csv(path_or_buf=pjoin(*[temp_folder, counts_out_filename]), sep=',')
 # Write TPM csv counts file with consolidated proteinIDs
-tpm_counts.to_csv(pjoin(*[temp_folder, tpm_counts_out_filename]),',')
+tpm_counts.to_csv(path_or_buf=pjoin(*[temp_folder, tpm_counts_out_filename]), sep=',')
