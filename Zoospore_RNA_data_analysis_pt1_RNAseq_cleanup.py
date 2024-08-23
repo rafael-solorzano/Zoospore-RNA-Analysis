@@ -66,7 +66,9 @@ def remove_proteinIDs_with_duplicate_aa_seqs(counts, dupes, prefix, index_id):
                 protID_remove = prefix + str(val)
                 for col in samples:
                     # set col,protID_keep count to sum of keep and remove counts
-                    counts[col][protID_keep] = counts.at[protID_keep,col] + counts.at[protID_remove,col]
+                    # counts[col][protID_keep] = counts.at[protID_keep,col] + counts.at[protID_remove,col]
+                    # do above line, but update due to FutureWarning. Use 'df.loc[row_indexer, "col"]=values' instead
+                    counts.loc[protID_keep, col] = counts.loc[protID_keep, col] + counts.loc[protID_remove, col]
                 #remove protID_remove row
                 counts = counts.drop(protID_remove)
     return counts
