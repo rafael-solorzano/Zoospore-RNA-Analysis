@@ -2,6 +2,14 @@
 #######################################################
 Scripts Outline:
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Dependencies:
+R: rtools, jsonlite, rlang, BiocManager (DESeq2)
+Python: pandas, scipy, bioinfokit, openpyxl, xlsxwriter
+Download Roboto font from Google fonts, OR change fonts in Python plots
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 Part 1: Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py
 - RNAseq raw data contains some transcripts with identical amino acid sequences. For the purposes of describing putative functions of the corresponding genes (ID'd by proteinID) to these transcripts, the RNAseq raw counts and TPM counts data are consolidated for groups of transcripts with identical amino acid sequence in this script.
 
