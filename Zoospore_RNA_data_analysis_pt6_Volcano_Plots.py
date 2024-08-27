@@ -70,6 +70,17 @@ def label_points_volcano_plot_proteinIDs(reg_df, pval_colname, num_top_points, l
     adjust_text(texts,arrowprops=dict(arrowstyle='-', color='black',alpha=0.5), force_text=0.1, force_points=0.1, expand_points=(1, 1), expand_text=(1, 1), lim=100)
     return
 
+def label_points_volcano_plot_proteinIDs_plus_note(reg_df, pval_colname, num_top_points, lfc_colname, note_colname):
+    # Filter up_df for the top 10 most significant genes (by p-value)
+    reg_df = reg_df.sort_values(by=pval_colname).head(num_top_points)
+
+    texts = []
+    for i,r in reg_df.iterrows():
+        texts.append(plt.text(r[lfc_colname], -np.log10(r[pval_colname]), str(r[note_colname] + ' proteinID\n' + str(r['proteinID'])), fontsize=20, ha='center', va='center'))
+
+    adjust_text(texts,arrowprops=dict(arrowstyle='-', color='black',alpha=0.5), force_text=0.1, force_points=0.1, expand_points=(1, 1), expand_text=(1, 1), lim=100)
+    return
+
 def organize_volcano_plot_inputs(dge_df, zoosp_upreg_colname='zoosp_upreg', mat_upreg_colname='mat_upreg',lfc_colname='log2FC', pval_colname='padj', pval_cutoff=0.05, lfc_cutoff=1, dp_size=100, dp_alpha=0.5, ax_label_size=30, ax_tick_size=30, ax_tick_len=10, ax_tick_width=2, dash_lens=[10,10], leg_size=25, legend=True, title="Volcano Plot", title_size=30):
     up_df = generate_dge_set(dge_df, "up", zoosp_upreg_colname, mat_upreg_colname)
     down_df = generate_dge_set(dge_df, "down", zoosp_upreg_colname, mat_upreg_colname)
@@ -125,6 +136,33 @@ dge_cazymes = pd.read_excel(pjoin(*[input_folder, input_dge_filename]), sheet_na
 # filter dge_cazymes for only rows with a value in column "CAZyme_defline"
 dge_cazymes = dge_cazymes[dge_cazymes["CAZyme_defline"].notnull()]
 
+# GH48
+dge_gh48 = dge_cazymes.copy()
+# filter for rows containing the string "Glycoside Hydrolase Family 48" in the column "CAZyme_defline"
+dge_gh48 = dge_gh48[dge_gh48["CAZyme_defline"].str.contains("Glycoside Hydrolase Family 48")]
+
+# GH1
+dge_gh1 = dge_cazymes.copy()
+# filter for rows containing the string "Glycoside Hydrolase Family 1" in the column "CAZyme_defline"
+dge_gh1 = dge_gh1[dge_gh1["CAZyme_defline"].str.contains("Glycoside Hydrolase Family 1")]
+
+# GH3
+dge_gh3 = dge_cazymes.copy()
+# filter for rows containing the string "Glycoside Hydrolase Family 3" in the column "CAZyme_defline"
+dge_gh3 = dge_gh3[dge_gh3["CAZyme_defline"].str.contains("Glycoside Hydrolase Family 3")]
+
+# GT8
+# filter for rows containing the string "Glycosyltransferase Family 8" in the column "CAZyme_defline"
+dge_gt8 = dge_cazymes.copy()
+dge_gt8 = dge_gt8[dge_gt8["CAZyme_defline"].str.contains("Glycosyltransferase Family 8")]
+
+# oxidative stress genes, filter the column "KEGG_pathway" for strings containing "Glutathione metabolism"
+dge_oxid = dge_summary.copy()
+# remove rows with nan values in the column "KEGG_pathway"
+dge_oxid = dge_oxid[dge_oxid["KEGG_pathway"].notnull()]
+dge_oxid = dge_oxid[dge_oxid["KEGG_pathway"].str.contains("Glutathione metabolism")]
+
+
 """
 Common Plot Settings
 """
@@ -153,41 +191,227 @@ dash_lens = [10,10]
 leg_size = 25
 title_size = 30
 
+"""
+Transcription Factors Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# """
+# Make volcano plot for transcription factors
+# """
+# plot_name = "Volcano_plot_TFs_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 4
+# num_top_points_down = 0
+# title = "Transcription Factors"
+# legend = True
+
+# plt.figure(figsize=(10,10))
+# up_tfs, down_tfs = organize_volcano_plot_inputs(dge_tfs, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_tfs, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_tfs, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
 
 """
-Make volcano plot for transcription factors
+Secondary Metabolite Core Genes Volcano Plot
 """
-plot_name = "Volcano_plot_TFs_" + today + ".png"
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_SMs_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 2
+# num_top_points_down = 1
+# title = "Core Secondary Metabolite Genes"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_sms, down_sms = organize_volcano_plot_inputs(dge_sms, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs_plus_note(up_sms, pval_colname, num_top_points_up, lfc_colname, note_colname='SM_cluster_type')
+# label_points_volcano_plot_proteinIDs_plus_note(down_sms, pval_colname, num_top_points_down, lfc_colname, note_colname='SM_cluster_type')
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+
+"""
+"""
+
+"""
+Oxidative Stress Genes Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_oxidative_stress_genes_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 0
+# num_top_points_down = 0
+# title = "Oxidative Stress Genes"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_oxid, down_oxid = organize_volcano_plot_inputs(dge_oxid, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_oxid, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_oxid, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
+"""
+Scaffoldins Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_scaffoldins_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 0
+# num_top_points_down = 5
+# title = "Proteins with Scaffoldin Domains"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_scaffoldins, down_scaffoldins = organize_volcano_plot_inputs(dge_scaffoldins, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_scaffoldins, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_scaffoldins, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
+
+"""
+GH48 Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_GH48_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 5
+# num_top_points_down = 0
+# title = "Glycoside Hydrolase Family 48"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_gh48, down_gh48 = organize_volcano_plot_inputs(dge_gh48, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_gh48, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_gh48, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
+"""
+GH1 Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_GH1_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 5
+# num_top_points_down = 2
+# title = "Glycoside Hydrolase Family 1"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_gh1, down_gh1 = organize_volcano_plot_inputs(dge_gh1, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_gh1, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_gh1, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
+"""
+GH3 Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_GH3_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 5
+# num_top_points_down = 2
+# title = "Glycoside Hydrolase Family 3"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_gh3, down_gh3 = organize_volcano_plot_inputs(dge_gh3, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_gh3, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_gh3, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
+"""
+GT8 Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_GT8_" + today + ".png"
 # Determine the number of top points to label in either direction
-num_top_points_up = 4
-num_top_points_down = 0
-title = "Transcription Factors"
-legend = True
+num_top_points_up = 0
+num_top_points_down = 6
+
+title = "Glycosyltransferase Family 8"
+legend = False
 
 plt.figure(figsize=(10,10))
-up_tfs, down_tfs = organize_volcano_plot_inputs(dge_tfs, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+up_gt8, down_gt8 = organize_volcano_plot_inputs(dge_gt8, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
 # Label points
-label_points_volcano_plot_proteinIDs(up_tfs, pval_colname, num_top_points_up, lfc_colname)
-label_points_volcano_plot_proteinIDs(down_tfs, pval_colname, num_top_points_down, lfc_colname)
+label_points_volcano_plot_proteinIDs(up_gt8, pval_colname, num_top_points_up, lfc_colname)
 
 # Save plot in output folder, use dpi=300
 plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
 plt.show()
 plt.close()
+"""
+"""
 
-
-# """
-# Make volcano plot for core secondary metabolite genes
-# """
-# plot_name = "Volcano_plot_SMS_" + today + ".png"
+"""
+All Genes Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_all_genes_" + today + ".png"
 # # Determine the number of top points to label in either direction
 # num_top_points_up = 0
 # num_top_points_down = 0
-# title = "Core Secondary Metabolite Genes"
+# title = ""
+# legend = False
 
+# plt.figure(figsize=(10,10))
+# up_all, down_all = organize_volcano_plot_inputs(dge_summary, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_all, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_all, pval_colname, num_top_points_down, lfc_colname)
 
-# # plot
-
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
 
 
 
