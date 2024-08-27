@@ -52,7 +52,7 @@ def generate_volcano_plot(up_df, down_df, ns_df, lfc_colname, pval_colname, pval
     plt.tick_params(axis='both', which='major', length = ax_tick_len, width = ax_tick_width)
     
     if legend:
-        plt.legend(fontsize=leg_size)
+        plt.legend(fontsize=leg_size, loc="best")
 
     # Add a title
     plt.title(title, fontsize=title_size)
@@ -151,6 +151,11 @@ dge_gh3 = dge_cazymes.copy()
 # filter for rows containing the string "Glycoside Hydrolase Family 3" in the column "CAZyme_defline"
 dge_gh3 = dge_gh3[dge_gh3["CAZyme_defline"].str.contains("Glycoside Hydrolase Family 3")]
 
+# CBM18
+dge_cbm18 = dge_cazymes.copy()
+# filter for rows containing the string "Carbohydrate-binding module family 18" in the column "CAZyme_defline"
+dge_cbm18 = dge_cbm18[dge_cbm18["CAZyme_defline"].str.contains("Carbohydrate-Binding Module Family 18 ")]
+
 # GT8
 # filter for rows containing the string "Glycosyltransferase Family 8" in the column "CAZyme_defline"
 dge_gt8 = dge_cazymes.copy()
@@ -162,6 +167,12 @@ dge_oxid = dge_summary.copy()
 dge_oxid = dge_oxid[dge_oxid["KEGG_pathway"].notnull()]
 dge_oxid = dge_oxid[dge_oxid["KEGG_pathway"].str.contains("Glutathione metabolism")]
 
+# Proteins with dockerin domain
+# Filter dge_summary for rows where column "CAZyme_description" contains either "DOC2" or "CBM10", as this is how I have defined proteins with dockerin domains
+dge_dockerin = dge_summary.copy()
+# filter for no nan values in the column "CAZyme_description"
+dge_dockerin = dge_dockerin[dge_dockerin["CAZyme_description"].notnull()]
+dge_dockerin = dge_dockerin[dge_dockerin["CAZyme_description"].str.contains("DOC2|CBM10")]
 
 """
 Common Plot Settings
@@ -228,7 +239,7 @@ Secondary Metabolite Core Genes Volcano Plot
 # num_top_points_up = 2
 # num_top_points_down = 1
 # title = "Core Secondary Metabolite Genes"
-# legend = False
+# legend = True
 
 # plt.figure(figsize=(10,10))
 # up_sms, down_sms = organize_volcano_plot_inputs(dge_sms, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
@@ -240,7 +251,6 @@ Secondary Metabolite Core Genes Volcano Plot
 # plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
 # plt.show()
 # plt.close()
-
 """
 """
 
@@ -366,26 +376,77 @@ GH3 Volcano Plot
 """
 
 """
+CBM18 volcano plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_CBM18_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 8
+# num_top_points_down = 4
+
+# title = "Carbohydrate-binding module family 18"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_cbm18, down_cbm18 = organize_volcano_plot_inputs(dge_cbm18, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_cbm18, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_cbm18, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
+
+"""
 GT8 Volcano Plot
 """
 # *** Remove comments to create volcano Plot ***
-plot_name = "Volcano_plot_GT8_" + today + ".png"
-# Determine the number of top points to label in either direction
-num_top_points_up = 0
-num_top_points_down = 6
+# plot_name = "Volcano_plot_GT8_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 0
+# num_top_points_down = 6
 
-title = "Glycosyltransferase Family 8"
-legend = False
+# title = "Glycosyltransferase Family 8"
+# legend = False
 
-plt.figure(figsize=(10,10))
-up_gt8, down_gt8 = organize_volcano_plot_inputs(dge_gt8, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
-# Label points
-label_points_volcano_plot_proteinIDs(up_gt8, pval_colname, num_top_points_up, lfc_colname)
+# plt.figure(figsize=(10,10))
+# up_gt8, down_gt8 = organize_volcano_plot_inputs(dge_gt8, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_gt8, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_gt8, pval_colname, num_top_points_down, lfc_colname)
 
-# Save plot in output folder, use dpi=300
-plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
-plt.show()
-plt.close()
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
+
+"""
+Proteins with Dockerin Domain Volcano Plot
+"""
+# *** Remove comments to create volcano Plot ***
+# plot_name = "Volcano_plot_dockerin_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 8
+# num_top_points_down = 5
+# title = "Proteins with Dockerin Domains"
+# legend = False
+
+# plt.figure(figsize=(10,10))
+# up_dockerin, down_dockerin = organize_volcano_plot_inputs(dge_dockerin, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# # Label points
+# label_points_volcano_plot_proteinIDs(up_dockerin, pval_colname, num_top_points_up, lfc_colname)
+# label_points_volcano_plot_proteinIDs(down_dockerin, pval_colname, num_top_points_down, lfc_colname)
+
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+# plt.show()
+# plt.close()
 """
 """
 
@@ -416,7 +477,23 @@ All Genes Volcano Plot
 
 
 
-
+"""
+Generate just the legend as output
+"""
+# plt.gca().set_axis_off()
+# plt.scatter([], [], color='#CD5555', label='upregulated in zoospores', s=dp_size, alpha=dp_alpha)
+# plt.scatter([], [], color='#9AC0CD', label='downregulated in zoospores', s=dp_size, alpha=dp_alpha)
+# plt.scatter([], [], color='#666666', label='not significant', s=dp_size, alpha=dp_alpha)
+# # Add legend
+# plt.legend(fontsize=leg_size, loc="best")
+# # Set boundaries of plot to be tight
+# plt.tight_layout()
+# # Save plot in output folder, use dpi=300
+# plt.savefig(pjoin(*[output_folder, "Volcano_plot_legend_" + today + ".png"]), dpi=300)
+# plt.show()
+# plt.close()
+"""
+"""
 
 
 
