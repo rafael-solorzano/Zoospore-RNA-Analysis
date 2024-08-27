@@ -3,6 +3,7 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import numpy as np
 from os.path import join as pjoin
+from adjustText import adjust_text
 
 input_folder = r'input' 
 temp_folder = r'temp'
@@ -21,18 +22,6 @@ output_folder = r'output'
 Functions
 """
 def generate_dge_set(df, dir, reg_colname_up, reg_colname_down):
-    """
-    Generate a set of differentially expressed genes based on the following criteria.
-
-    Inputs:
-    df: pandas dataframe, dge summary data
-    dir: up, down, neither
-    reg_colname_up: str, column name to describe if a gene is differentially regulated in zoosp (values are 0 or 1)
-    reg_colname_down: str, column name to describe if a gene is differentially regulated in mat (values are 0 or 1)
-
-    Outputs:
-    dge_set: pandas dataframe, filtered dge summary data for only differentially expressed genes
-    """
     # copy the dataframe and filter for only rows with a value in the column reg_colname
     dge_set = df.copy()
     if dir == "up":
@@ -46,10 +35,10 @@ def generate_dge_set(df, dir, reg_colname_up, reg_colname_down):
         return None
     return dge_set
 
-def generate_volcano_plot(up_tfs, down_tfs, ns_tfs, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, plot_name, output_folder, dp_size=100, dp_alpha=0.5, ax_label_size=30, ax_tick_size=30, ax_tick_len=10, ax_tick_width=2, dash_lens=[10,10], leg_size=25, legend=True):
-    plt.scatter(up_tfs[lfc_colname], -np.log10(up_tfs[pval_colname]), color='#CD5555', label='upregulated in zoospores', s=dp_size, alpha=dp_alpha)
-    plt.scatter(down_tfs[lfc_colname], -np.log10(down_tfs[pval_colname]), color='#9AC0CD', label='downregulated in zoospores', s=dp_size, alpha=dp_alpha)
-    plt.scatter(ns_tfs[lfc_colname], -np.log10(ns_tfs[pval_colname]), color='#666666', label='not significant', s=dp_size, alpha=dp_alpha)
+def generate_volcano_plot(up_df, down_df, ns_df, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size):
+    plt.scatter(up_df[lfc_colname], -np.log10(up_df[pval_colname]), color='#CD5555', label='upregulated in zoospores', s=dp_size, alpha=dp_alpha)
+    plt.scatter(down_df[lfc_colname], -np.log10(down_df[pval_colname]), color='#9AC0CD', label='downregulated in zoospores', s=dp_size, alpha=dp_alpha)
+    plt.scatter(ns_df[lfc_colname], -np.log10(ns_df[pval_colname]), color='#666666', label='not significant', s=dp_size, alpha=dp_alpha)
 
     plt.axhline(-np.log10(pval_cutoff), color='grey', linestyle='--', dashes=dash_lens)
     plt.axvline(lfc_cutoff, color='grey', linestyle='--', dashes=dash_lens)
@@ -65,10 +54,33 @@ def generate_volcano_plot(up_tfs, down_tfs, ns_tfs, lfc_colname, pval_colname, p
     if legend:
         plt.legend(fontsize=leg_size)
 
-    # Save plot in output folder
-    plt.savefig(pjoin(*[output_folder, plot_name]))
-    plt.close()
+    # Add a title
+    plt.title(title, fontsize=title_size)
+
     return
+
+def label_points_volcano_plot_proteinIDs(reg_df, pval_colname, num_top_points, lfc_colname):
+    # Filter up_df for the top 10 most significant genes (by p-value)
+    reg_df = reg_df.sort_values(by=pval_colname).head(num_top_points)
+
+    texts = []
+    for i,r in reg_df.iterrows():
+        texts.append(plt.text(r[lfc_colname], -np.log10(r[pval_colname]), 'proteinID \n' + str(r['proteinID']), fontsize=20, ha='center', va='center'))
+
+    adjust_text(texts,arrowprops=dict(arrowstyle='-', color='black',alpha=0.5), force_text=0.1, force_points=0.1, expand_points=(1, 1), expand_text=(1, 1), lim=100)
+    return
+
+def organize_volcano_plot_inputs(dge_df, zoosp_upreg_colname='zoosp_upreg', mat_upreg_colname='mat_upreg',lfc_colname='log2FC', pval_colname='padj', pval_cutoff=0.05, lfc_cutoff=1, dp_size=100, dp_alpha=0.5, ax_label_size=30, ax_tick_size=30, ax_tick_len=10, ax_tick_width=2, dash_lens=[10,10], leg_size=25, legend=True, title="Volcano Plot", title_size=30):
+    up_df = generate_dge_set(dge_df, "up", zoosp_upreg_colname, mat_upreg_colname)
+    down_df = generate_dge_set(dge_df, "down", zoosp_upreg_colname, mat_upreg_colname)
+    # ns = not significant
+    ns_df = generate_dge_set(dge_df, "neither", zoosp_upreg_colname, mat_upreg_colname)
+
+    generate_volcano_plot(up_df, down_df, ns_df, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+
+    # Fit the border to the plot
+    plt.tight_layout()
+    return up_df, down_df
 
 """
 Filenames for import
@@ -97,6 +109,9 @@ pval_cutoff = 0.05
 lfc_cutoff = 1
 # tpm_cutoff = 1
 
+# Get today's date
+today = pd.to_datetime('today').strftime('%Y-%m-%d')
+
 
 """
 Import data
@@ -110,20 +125,12 @@ dge_cazymes = pd.read_excel(pjoin(*[input_folder, input_dge_filename]), sheet_na
 # filter dge_cazymes for only rows with a value in column "CAZyme_defline"
 dge_cazymes = dge_cazymes[dge_cazymes["CAZyme_defline"].notnull()]
 
-
 """
-Make volcano plot for transcription factors
+Common Plot Settings
 """
-# Get today's date
-today = pd.to_datetime('today').strftime('%Y-%m-%d')
-plot_name = "Volcano_plot_TFs_" + today + ".png"
-up_tfs = generate_dge_set(dge_tfs, "up", zoosp_upreg_colname, mat_upreg_colname)
-down_tfs = generate_dge_set(dge_tfs, "down", zoosp_upreg_colname, mat_upreg_colname)
-# ns = not significant
-ns_tfs = generate_dge_set(dge_tfs, "neither", zoosp_upreg_colname, mat_upreg_colname)
-
-# plot
-plt.figure(figsize=(10,10))
+# Default plot settings
+# Considered putting a break in the y-axis, but decided against it
+# bax = brokenaxes(ylims=((-5, 50), (80, 100)), hspace=.05)
 # set data point size: 10
 dp_size = 100
 # set data point transparency: 0.5
@@ -144,14 +151,43 @@ dash_lens = [10,10]
 # create legend
 # legend font size: 20
 leg_size = 25
-
-generate_volcano_plot(up_tfs, down_tfs, ns_tfs, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, plot_name, output_folder, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend=False)
-
+title_size = 30
 
 
 """
 Make volcano plot for transcription factors
 """
+plot_name = "Volcano_plot_TFs_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 4
+num_top_points_down = 0
+title = "Transcription Factors"
+legend = True
+
+plt.figure(figsize=(10,10))
+up_tfs, down_tfs = organize_volcano_plot_inputs(dge_tfs, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs(up_tfs, pval_colname, num_top_points_up, lfc_colname)
+label_points_volcano_plot_proteinIDs(down_tfs, pval_colname, num_top_points_down, lfc_colname)
+
+# Save plot in output folder, use dpi=300
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=300)
+plt.show()
+plt.close()
+
+
+# """
+# Make volcano plot for core secondary metabolite genes
+# """
+# plot_name = "Volcano_plot_SMS_" + today + ".png"
+# # Determine the number of top points to label in either direction
+# num_top_points_up = 0
+# num_top_points_down = 0
+# title = "Core Secondary Metabolite Genes"
+
+
+# # plot
+
 
 
 
