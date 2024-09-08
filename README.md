@@ -32,14 +32,8 @@ This project includes multiple scripts:
 | Zoospore_RNA_data_analysis_pt6_Volcano_Plots.py | Additional script for generating volcano plots in the publication. |
 
 ### Script Details
-Script Descriptions:
-
-Part 1: 
-RNA Data Analysis RNAseq Cleanup
+*Part 1: RNA Data Analysis RNAseq Cleanup*
 Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py
-R v4.2.2
-Bioconductor v3.16
-DESeq2 v1.36.0
 
 Required Inputs by Script:
 1) 'Neosp1_FilteredModels5_deflines_pre.fasta'
@@ -69,7 +63,10 @@ Outputs to temp_folder:
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Part 2: DESeq2 Analysis in R
+*Part 2: DESeq2 Analysis in R*
+R v4.2.2
+Bioconductor v3.16
+DESeq2 v1.36.0
 
 Manually Added Inputs:
 1) 'coldata_DESeq2.txt'
@@ -89,7 +86,7 @@ Outputs to temp_folder:
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Part 3: Differential Gene Expression Analysis
+*Part 3: Differential Gene Expression Analysis*
 
 Changeable values:
 1) mat_samples = list of mat sample names
@@ -151,7 +148,7 @@ Outputs to Output Folder:
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Part 4: RNA Data Analysis for Specific Annotations
+*Part 4: RNA Data Analysis for Specific Annotations*
 
 Manually Added Inputs:
 1) 'Neosp1_SMs_orthologs.xlsx'
@@ -182,6 +179,7 @@ Inputs from Previous Scripts (deposited in temp folder):
 Outputs to Output Folder:
 1) 'DGE_summary_output_formatted.xlsx'
 - Excel DGE analysis for genes with specific annotations per excel sheet (see input annotations).
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Part 5: RNA Data Analysis for CAZyme and Cellulosome Annotations
@@ -201,6 +199,12 @@ Inputs from Previous Scripts (deposited in temp folder):
 
 Outputs to Output Folder:
 1) 'DGE_summary_dbCAN2_and_cellulosomes.xlsx'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Part 6: Volcano Plot Generation for Publication
+
+(to be filled in)
 
 ## Support
 For support with using these scripts, please contact lbutkovich@ucsb.edu.
