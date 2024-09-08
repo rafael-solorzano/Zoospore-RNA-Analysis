@@ -1,36 +1,14 @@
-#  Transcriptomic Analysis of Zoospore vs Mats of Anaerobic Gut Fungi
+#  Transcriptomic Analysis of Anaerobic Gut Fungal Life Stages: Zoospores vs Mats
 
-## Description
-These scripts generate global gene expression profiles and perform differential gene expression analysis for zoospore vs mat sample groups.
-In this project, RNA-Seq data was acquired for 2 sample groups from anaerobic gut fungi (phylum Neocallimastigomycota): 
+## Background
+These scripts generate **global gene expression profiles** and perform **differential gene expression analysis** for zoospore vs mat sample groups.
+In this project, **RNA-Seq data** was acquired for two sample groups from **anaerobic gut fungi** (phylum Neocallimastigomycota): 
 1. Culture cell pellets enriched in **zoospores,** the young life stage of anaerobic gut fungi
-2. Fungal mats with mixed life stages, including sporangia, the mature life stage of anaerobic gut fungi
-
-This project includes multiple scripts:
-| Script Name                                       | Description                               |
-| ------------------------------------------------- | ----------------------------------------- |
-| Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py | RNAseq raw data contains some transcripts with identical amino acid sequences. For the purposes of describing putative functions of the corresponding genes (ID'd by proteinID) to these transcripts, the RNAseq raw counts and TPM counts data are consolidated for groups of transcripts with identical amino acid sequence in this script. |
-| Zoospore_RNA_data_analysis_pt2_DESeq2_in_R.R | a |
-| Zoospore_RNA_data_analysis_pt3_DGE_Main_Annotations.py | a |
-| Zoospore_RNA_data_analysis_pt4_DGE_Additional_Annotations.py | a |
-| Zoospore_RNA_data_analysis_pt5_dbCAN2_and_Cellulosomes.py | a |
-| Zoospore_RNA_data_analysis_pt6_Volcano_Plots.py | a |
-
-
-1. Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py
-- 
-2. Zoospore_RNA_data_analysis_pt2_DESeq2_in_R.R
-3. Zoospore_RNA_data_analysis_pt3_DGE_Main_Annotations.py
-4. Zoospore_RNA_data_analysis_pt4_DGE_Additional_Annotations.py
-5. Zoospore_RNA_data_analysis_pt5_dbCAN2_and_Cellulosomes.py
-6. Zoospore_RNA_data_analysis_pt6_Volcano_Plots.py
+2. **Fungal mats** with mixed life stages, including sporangia, the mature life stage of anaerobic gut fungi
 
 ## Associated Publication
 Please see the associated publication for more project-specific details:
 Lazarina V. Butkovich, Patrick A. Leggieri, Stephen P. Lillington, Tejas A. Navaratna, Candice L. Swift, Nikola G. Malinov, Thea R. Zalunardo, Oliver B. Vining, Anna Lipzen, Mei Wang, Juying Yan, Vivian Ng, Igor Grigoriev, Michelle A. O’Malley, **"Separation of life stages within anaerobic fungi highlights differences in global transcription and metabolism."** (in preparation).
-
-
-### Features
 
 ## Installation
 ### Dependencies:
@@ -38,55 +16,22 @@ R: rtools, jsonlite, rlang, BiocManager (DESeq2)
 Python: pandas, scipy, bioinfokit, openpyxl, xlsxwriter
 Download Roboto font from Google fonts, OR change fonts in Python plots
 
-## Support
-For support with using these scripts, please contact lbutkovich@ucsb.edu.
-
-## Authors and Acknowledgements
-Primary author: Lazarina Butkovich, UCSB
-Thank you to Fred Krauss for feedback and assistance in writing and formatting these scripts. Additionally, thank you to Dr. Patrick Leggieri for assistance in determining appropriate statistical analysis. 
-
-
-
-## 
-Scripts Outline:
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Dependencies:
-R: rtools, jsonlite, rlang, BiocManager (DESeq2)
-Python: pandas, scipy, bioinfokit, openpyxl, xlsxwriter
-Download Roboto font from Google fonts, OR change fonts in Python plots
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Part 1: Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py
-- RNAseq raw data contains some transcripts with identical amino acid sequences. For the purposes of describing putative functions of the corresponding genes (ID'd by proteinID) to these transcripts, the RNAseq raw counts and TPM counts data are consolidated for groups of transcripts with identical amino acid sequence in this script.
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Part 2: Zoospore_RNA_data_analysis_pt2_DESeq2_in_R.R
-- In order to perform differential gene expression (DGE) analysis, this script runs DESeq2 in R to generate log2-fold change data and p-values for each proteinID. 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Part 3: Zoospore_RNA_data_analysis_pt3_DGE_Main_Annotations.py
-- This script aligns putative functional annotations from JGI Mycocosm to the proteinIDs considered in this dataset. The main annotations considered are KOG, GO, IPR, and KEGG. 
+## Description of Scripts
+This project includes multiple scripts:
+| Script Name                                       | Description                               |
+| ------------------------------------------------- | ----------------------------------------- |
+| Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py | RNAseq raw data contains some transcripts with identical amino acid sequences. For the purposes of describing putative functions of the corresponding genes (ID'd by proteinID) to these transcripts, the RNAseq raw counts and TPM counts data are consolidated for groups of transcripts with identical amino acid sequence in this script. |
+| Zoospore_RNA_data_analysis_pt2_DESeq2_in_R.R | In order to perform differential gene expression (DGE) analysis, this script runs DESeq2 in R to generate log2-fold change data and p-values for each proteinID.  |
+| Zoospore_RNA_data_analysis_pt3_DGE_Main_Annotations.py | - This script aligns putative functional annotations from JGI Mycocosm to the proteinIDs considered in this dataset. The main annotations considered are KOG, GO, IPR, and KEGG. 
 - Significant upregulation of a gene in the zoospores is defined as follows: DESeq2 p-value < 0.05, log2 fold-change < 1, and average TPM in zoospore samples > 1. Significant upregulation of a gene in the mats is defined as follows: DESeq2 p-value < 0.05, log2 fold-change > 1, and average TPM in mat samples > 1.
 - For each gene annotation group, differential expression data is organized, revealing the number of genes in the annotation group that are significantly upregulated in zoospores and the number that are significantly upregulated in mats. These data are necessary for the Fisher's Exact Statistical Tests (see below). 
-- This script generates Fisher's Exact Statistical Test data for gene annotation groups of sufficient size (greater than 10 genes). The Fisher's Exact Test generates 2 adjusted p-values for each annotation group to answer two questions: (1) "Is this gene annotation group upregulated in zoospores?" and (2) "Is this gene annotation group significantly upregulated in mats?" Additional annotations are included: secondary metabolites, Orthologous groups with other anaerobic gut fungal strains using results from the OrthoFinder tool, and CAZymes.
+- This script generates Fisher's Exact Statistical Test data for gene annotation groups of sufficient size (greater than 10 genes). The Fisher's Exact Test generates 2 adjusted p-values for each annotation group to answer two questions: (1) "Is this gene annotation group upregulated in zoospores?" and (2) "Is this gene annotation group significantly upregulated in mats?" Additional annotations are included: secondary metabolites, Orthologous groups with other anaerobic gut fungal strains using results from the OrthoFinder tool, and CAZymes. |
+| Zoospore_RNA_data_analysis_pt4_DGE_Additional_Annotations.py | This script takes the results from part 3 and adds Excel sheet outputs to focus on additional specific annotations or format specific annotations introduced in part 3. |
+| Zoospore_RNA_data_analysis_pt5_dbCAN2_and_Cellulosomes.py | In order to roughly describe how cellulosome components are differentially regulated in this transcriptomic dataset, proteomics data with previously detected, likely cellulosome components (dockerin or scaffoldin).
+- The tool dbCAN2 predicts additional CAZyme annotations to supplement CAZyme annotations from JGI MycoCosm. |
+| Zoospore_RNA_data_analysis_pt6_Volcano_Plots.py | Additional script for generating volcano plots in the publication. |
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Part 4: Zoospore_RNA_data_analysis_pt4_DGE_Additional_Annotations.py
-- This script takes the results from part 3 and adds Excel sheet outputs to focus on additional specific annotations or format specific annotations introduced in part 3. 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Part 5: Zoospore_RNA_data_analysis_pt5_dbCAN2_and_Cellulosomes.py
-- In order to roughly describe how cellulosome components are differentially regulated in this transcriptomic dataset, proteomics data with previously detected, likely cellulosome components (dockerin or scaffoldin).
-- The tool dbCAN2 predicts additional CAZyme annotations to supplement CAZyme annotations from JGI MycoCosm.
-
-#######################################################
-
+### Script Details
 Script Descriptions:
 
 Part 1: 
@@ -256,3 +201,10 @@ Inputs from Previous Scripts (deposited in temp folder):
 
 Outputs to Output Folder:
 1) 'DGE_summary_dbCAN2_and_cellulosomes.xlsx'
+
+## Support
+For support with using these scripts, please contact lbutkovich@ucsb.edu.
+
+## Authors and Acknowledgements
+Primary author: Lazarina Butkovich, UCSB
+Thank you to Fred Krauss for feedback and assistance in writing and formatting these scripts. Additionally, thank you to Dr. Patrick Leggieri for assistance in determining appropriate statistical analysis. 
