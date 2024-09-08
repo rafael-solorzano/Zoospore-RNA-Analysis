@@ -247,4 +247,4 @@ Primary author: Lazarina Butkovich (University of California, Santa Barbara)
 
 Thank you to Fred Krauss for feedback and assistance in writing and formatting these scripts. 
 
-Additionally, thank you to Dr. Patrick Leggieri for assistance in determining appropriate statistical analysis. 
+Thank you to Dr. Patrick Leggieri for assistance in determining appropriate statistical analysis. 
