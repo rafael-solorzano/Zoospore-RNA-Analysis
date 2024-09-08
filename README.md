@@ -42,29 +42,35 @@ Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py
 
 Required Inputs by Script:
 1) 'Neosp1_FilteredModels5_deflines_pre.fasta'
-- FASTA file for genes in Neocallimastix californiae G1 genome,'Neosp1_FilteredModels5_deflines_pre.fasta'
-Downloaded from JGI MycoCosm, under Annotation --> Filtered Models ("best") --> Genes --> "Neosp1_FilteredModels5_deflines.gff.gz" for Project 1029446, 20171122.
+
+FASTA file for genes in Neocallimastix californiae G1 genome,'Neosp1_FilteredModels5_deflines_pre.fasta' downloaded from JGI MycoCosm, under Annotation --> Filtered Models ("best") --> Genes --> "Neosp1_FilteredModels5_deflines.gff.gz" for Project 1029446, 20171122.
 The FASTA lists gene keys, identified by MycoCosm proteinID, followed by amino acid sequences
 
 2) 'counts_RNAseq_original.txt'
-- Note, raw RNA-Seq reads are available at NCBI BioProject: PRJNA982907 to PRJNA982924 
+
+Note, raw RNA-Seq reads are available at NCBI BioProject: PRJNA982907 to PRJNA982924 
 
 3) 'tpm_counts_RNAseq_original.txt'
-- Transcripts-per-million normalization is considered in this study. 
+
+Transcripts-per-million normalization is considered in this study. 
 
 Outputs to temp_folder:
 
 1) 'Neosp1_FilteredModels5_deflines_post.fasta'
-- Modified input FASTA files
+
+Modified input FASTA files
 
 2) 'counts_RNAseq_updated.csv'
-- Counts combined for proteinIDs with identical amino acid sequences.
+
+Counts combined for proteinIDs with identical amino acid sequences.
 
 3) 'tpm_counts_RNAseq_updated.csv'
-- Transcripts-per-million normalized counts with counts combined for proteinIDs with identical amino acid sequences.
+
+Transcripts-per-million normalized counts with counts combined for proteinIDs with identical amino acid sequences.
 
 4) 'Neosp1_FilteredModels5_deflines_duped_proteinIDs_sorted.fasta'
-- This output is a dictionary describing the proteinIDs with identical amino acid sequences.
+
+This output is a dictionary describing the proteinIDs with identical amino acid sequences.
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -75,19 +81,22 @@ DESeq2 v1.36.0
 
 Manually Added Inputs:
 1) 'coldata_DESeq2.txt'
-- DESeq2 Metadata input, describing samples and sample groups
+
+DESeq2 Metadata input, describing samples and sample groups
 
 Inputs from Temp Folder (previous script outputs):
 1) 'counts_RNAseq_updated.csv'
 
 Outputs to temp_folder:
 1) 'deseq2_output.csv'
-- DESeq2 output, including log2fold-change and p-value data for each proteinID.
+
+DESeq2 output, including log2fold-change and p-value data for each proteinID.
 
 2) 'deseq2_normalized_counts.csv'
 
 3) 'deseq2_normalized_counts_labeled.csv'
-- DESeq2-normazlied counts data with proteinIDs
+
+DESeq2-normazlied counts data with proteinIDs
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -133,23 +142,29 @@ Inputs from Previous Scripts (deposited in temp folder):
 
 Outputs to Temp Folder:
 1) 'DGE_Summary_output_main.xlsx'
-- (see description under version in Output Folder)
+
+(see description under version in Output Folder)
 
 2) 'All_annotation_dataframes.xlsx'
-- In this script, pandas dataframes are generated for the various main annotations. For any given annotation in a main annotation class, the excel data sheets list the proteinIDs in the annotation and the number of those proteinIDs that are classified as "upregulated in zoospores" and "upregulated in mats." 
+
+In this script, pandas dataframes are generated for the various main annotations. For any given annotation in a main annotation class, the excel data sheets list the proteinIDs in the annotation and the number of those proteinIDs that are classified as "upregulated in zoospores" and "upregulated in mats." 
 
 Outputs to Output Folder:
 1) 'volcano.png'
-- Volcano plot using (log2FC vs. -log10(padj))
+
+Volcano plot using (log2FC vs. -log10(padj))
 
 2) 'DGE_Statistics_and_Data_Tables.xlsx'
-- Excel output for general statistics for the transcriptomic dataset
+
+Excel output for general statistics for the transcriptomic dataset
 
 3) 'DGE_Summary_output_main.xlsx'
-- DGE for main annotations (KOG, GO, IPR, KEGG), including Fisher's Exact Test statistics for gene annotations with 10< genes. This file is stored in both temp and output folder, and downstream scripts take the version from the temp folder and add onto it.
+
+DGE for main annotations (KOG, GO, IPR, KEGG), including Fisher's Exact Test statistics for gene annotations with 10< genes. This file is stored in both temp and output folder, and downstream scripts take the version from the temp folder and add onto it.
 
 4) 'DGE_Summary_CAZymes_output.xlsx'
-- This output is similar to "DGE_Summary_output_main.xlsx" except that it covers CAZyme annotations from JGI MycoCosm.
+
+This output is similar to "DGE_Summary_output_main.xlsx" except that it covers CAZyme annotations from JGI MycoCosm.
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -157,19 +172,24 @@ Outputs to Output Folder:
 
 Manually Added Inputs:
 1) 'Neosp1_SMs_orthologs.xlsx'
-- also input for part 3
+
+also input for part 3
 
 2) 'G1_hydrogenosomes.xlsx'
-- This excel contains a list of proteinIDs with putative hydrogenosome-related function based on JGI MycoCosm annotations. The excel also contains DeepLoc (https://doi.org/10.1093/bioinformatics/btx431) cellular localization notes, including an amino acid sequence-based prediction score for how a protein localizes to the hydrogenosome ("Mitochondria" and "Plastid" proxy for hydrogenosomes).
+
+This excel contains a list of proteinIDs with putative hydrogenosome-related function based on JGI MycoCosm annotations. The excel also contains DeepLoc (https://doi.org/10.1093/bioinformatics/btx431) cellular localization notes, including an amino acid sequence-based prediction score for how a protein localizes to the hydrogenosome ("Mitochondria" and "Plastid" proxy for hydrogenosomes).
 
 3) 'G1_SWEETs.xlsx'
-- This excel describes Sugars Will Eventually be Exported Transporters annotations for N. californiae (https://doi.org/10.1016/j.ymben.2021.04.009).
+
+This excel describes Sugars Will Eventually be Exported Transporters annotations for N. californiae (https://doi.org/10.1016/j.ymben.2021.04.009).
 
 4) 'G1_transcription_factors.xlsx'
-- This excel contains putative annotations for N. californiae transcription factors, based on JGI MycoCosm annotations with either GO ID 3700 ("DNA-binding transcription factor activity") or PF00096 ("Zinc finger, C2H2 type") annotations, and this selection is further narrowed down by considering only genes that contain the strings “transcription” or “Zn-finger” in the KOG defline or KOG class descriptors. 
+
+This excel contains putative annotations for N. californiae transcription factors, based on JGI MycoCosm annotations with either GO ID 3700 ("DNA-binding transcription factor activity") or PF00096 ("Zinc finger, C2H2 type") annotations, and this selection is further narrowed down by considering only genes that contain the strings “transcription” or “Zn-finger” in the KOG defline or KOG class descriptors. 
 
 5) 'G1_UPR_HSR.csv'
-- This excel contains a list of proteinIDs with unfolded protein response genes and heat shock response genes from S. Seppala et al. (https://doi.org/10.1186/s12934-016-0611-7). These annotations are considered but not focused on in the manuscript.
+
+This excel contains a list of proteinIDs with unfolded protein response genes and heat shock response genes from S. Seppala et al. (https://doi.org/10.1186/s12934-016-0611-7). These annotations are considered but not focused on in the manuscript.
 
 6) TCDB (Transporter Classification Database, https://doi.org/10.1093/nar/gkaa1004) related files
 - 'output_TCDB_BLASTp_filtered.csv' This .csv contains information from local BLASTp (loose cutoff for matches, e-value < 0.01)of N. californiae genes to the genes in the TCDB. The purpose of the local BLASTp is to assign putative transporter functions to N. californiae proteinIDs.
@@ -179,11 +199,13 @@ Manually Added Inputs:
 
 Inputs from Previous Scripts (deposited in temp folder):
 1) 'DGE_Summary_output_main.xlsx'
-- from script Part 3
+
+from script Part 3
 
 Outputs to Output Folder:
 1) 'DGE_summary_output_formatted.xlsx'
-- Excel DGE analysis for genes with specific annotations per excel sheet (see input annotations).
+
+Excel DGE analysis for genes with specific annotations per excel sheet (see input annotations).
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -191,16 +213,19 @@ Part 5: RNA Data Analysis for CAZyme and Cellulosome Annotations
 
 Manually Added Inputs:
 1) dbCAN2 CAZyme predictions (multiple parts, with filenames as 'G1_partX_dbCAN_output.xlsx', where X=1 through 6)
-- These excel sheets were generated by running the CAZyme prediction tool dbCAN2 (https://doi.org/10.1093/nar/gky418).
+
+These excel sheets were generated by running the CAZyme prediction tool dbCAN2 (https://doi.org/10.1093/nar/gky418).
 
 Inputs from Previous Scripts (deposited in temp folder):
 1) 'DGE_Summary_output_main.xlsx'
 
 2) 'cellulosomes_BLASTp_results.csv'
-- (see description for 'G1_cellulosomes_proteomics.csv')
+
+(see description for 'G1_cellulosomes_proteomics.csv')
 
 3) 'G1_cellulosomes_proteomics.csv'
-- This .csv describes proteomics data results for N. californiae grown in Medium C with reed canary grass. The proteomics data was originally aligned to one set of N. californiae proteinIDs and filtered for proteinIDs with putative cellulosome component function. In order to match with the rest of this data analysis, I performed local BLASTp of the proteinIDs I am considering (listed in 'Neosp1_FilteredModels5_deflines_post.fasta') against the proteinIDs with proteomics data. The resulting analysis aligns the transcriptomic data (zoospore vs. mats) with proteomics data with putative cellulosome component annotations.
+
+This .csv describes proteomics data results for N. californiae grown in Medium C with reed canary grass. The proteomics data was originally aligned to one set of N. californiae proteinIDs and filtered for proteinIDs with putative cellulosome component function. In order to match with the rest of this data analysis, I performed local BLASTp of the proteinIDs I am considering (listed in 'Neosp1_FilteredModels5_deflines_post.fasta') against the proteinIDs with proteomics data. The resulting analysis aligns the transcriptomic data (zoospore vs. mats) with proteomics data with putative cellulosome component annotations.
 
 Outputs to Output Folder:
 1) 'DGE_summary_dbCAN2_and_cellulosomes.xlsx'
