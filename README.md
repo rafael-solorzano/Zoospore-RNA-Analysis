@@ -1,5 +1,53 @@
-# Zoospore-RNA-Analysis
-#######################################################
+#  Transcriptomic Analysis of Zoospore vs Mats of Anaerobic Gut Fungi
+
+## Description
+These scripts generate global gene expression profiles and perform differential gene expression analysis for zoospore vs mat sample groups.
+In this project, RNA-Seq data was acquired for 2 sample groups from anaerobic gut fungi (phylum Neocallimastigomycota): 
+1. Culture cell pellets enriched in **zoospores,** the young life stage of anaerobic gut fungi
+2. Fungal mats with mixed life stages, including sporangia, the mature life stage of anaerobic gut fungi
+
+This project includes multiple scripts:
+| Script Name                                       | Description                               |
+| ------------------------------------------------- | ----------------------------------------- |
+| Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py | RNAseq raw data contains some transcripts with identical amino acid sequences. For the purposes of describing putative functions of the corresponding genes (ID'd by proteinID) to these transcripts, the RNAseq raw counts and TPM counts data are consolidated for groups of transcripts with identical amino acid sequence in this script. |
+| Zoospore_RNA_data_analysis_pt2_DESeq2_in_R.R | a |
+| Zoospore_RNA_data_analysis_pt3_DGE_Main_Annotations.py | a |
+| Zoospore_RNA_data_analysis_pt4_DGE_Additional_Annotations.py | a |
+| Zoospore_RNA_data_analysis_pt5_dbCAN2_and_Cellulosomes.py | a |
+| Zoospore_RNA_data_analysis_pt6_Volcano_Plots.py | a |
+
+
+1. Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py
+- 
+2. Zoospore_RNA_data_analysis_pt2_DESeq2_in_R.R
+3. Zoospore_RNA_data_analysis_pt3_DGE_Main_Annotations.py
+4. Zoospore_RNA_data_analysis_pt4_DGE_Additional_Annotations.py
+5. Zoospore_RNA_data_analysis_pt5_dbCAN2_and_Cellulosomes.py
+6. Zoospore_RNA_data_analysis_pt6_Volcano_Plots.py
+
+## Associated Publication
+Please see the associated publication for more project-specific details:
+Lazarina V. Butkovich, Patrick A. Leggieri, Stephen P. Lillington, Tejas A. Navaratna, Candice L. Swift, Nikola G. Malinov, Thea R. Zalunardo, Oliver B. Vining, Anna Lipzen, Mei Wang, Juying Yan, Vivian Ng, Igor Grigoriev, Michelle A. O’Malley, **"Separation of life stages within anaerobic fungi highlights differences in global transcription and metabolism."** (in preparation).
+
+
+### Features
+
+## Installation
+### Dependencies:
+R: rtools, jsonlite, rlang, BiocManager (DESeq2)
+Python: pandas, scipy, bioinfokit, openpyxl, xlsxwriter
+Download Roboto font from Google fonts, OR change fonts in Python plots
+
+## Support
+For support with using these scripts, please contact lbutkovich@ucsb.edu.
+
+## Authors and Acknowledgements
+Primary author: Lazarina Butkovich, UCSB
+Thank you to Fred Krauss for feedback and assistance in writing and formatting these scripts. Additionally, thank you to Dr. Patrick Leggieri for assistance in determining appropriate statistical analysis. 
+
+
+
+## 
 Scripts Outline:
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
