@@ -17,6 +17,7 @@ The main steps are as follows:
 
 ## Associated Publication
 Please see the associated publication for more project-specific details:
+
 Lazarina V. Butkovich, Patrick A. Leggieri, Stephen P. Lillington, Tejas A. Navaratna, Candice L. Swift, Nikola G. Malinov, Thea R. Zalunardo, Oliver B. Vining, Anna Lipzen, Mei Wang, Juying Yan, Vivian Ng, Igor Grigoriev, Michelle A. O’Malley, **"Separation of life stages within anaerobic fungi highlights differences in global transcription and metabolism."** (in preparation).
 
 ## Installation
@@ -240,5 +241,8 @@ Part 6: Volcano Plot Generation for Publication
 For support with using these scripts, please contact lbutkovich@ucsb.edu.
 
 ## Authors and Acknowledgements
-Primary author: Lazarina Butkovich, UCSB
-Thank you to Fred Krauss for feedback and assistance in writing and formatting these scripts. Additionally, thank you to Dr. Patrick Leggieri for assistance in determining appropriate statistical analysis. 
+Primary author: Lazarina Butkovich (University of California, Santa Barbara)
+
+Thank you to Fred Krauss for feedback and assistance in writing and formatting these scripts. 
+
+Additionally, thank you to Dr. Patrick Leggieri for assistance in determining appropriate statistical analysis. 
