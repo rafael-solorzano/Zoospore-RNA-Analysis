@@ -22,9 +22,11 @@ Lazarina V. Butkovich, Patrick A. Leggieri, Stephen P. Lillington, Tejas A. Nava
 
 ## Installation
 ### Dependencies:
-R: rtools, jsonlite, rlang, BiocManager (DESeq2)
-Python: pandas, scipy, bioinfokit, openpyxl, xlsxwriter
-Download Roboto font from Google fonts, OR change fonts in Python plots
+- R: rtools, jsonlite, rlang, BiocManager (DESeq2)
+
+- Python: pandas, scipy, bioinfokit, openpyxl, xlsxwriter
+
+- Download Roboto font from Google fonts, OR change fonts in Python plots
 
 ## Description of Scripts
 This project includes multiple scripts:
@@ -37,14 +39,14 @@ This project includes multiple scripts:
 | Zoospore_RNA_data_analysis_pt5_dbCAN2_and_Cellulosomes.py | In order to roughly describe how cellulosome components are differentially regulated in this transcriptomic dataset, proteomics data with previously detected, likely cellulosome components (dockerin or scaffoldin). The tool dbCAN2 predicts additional CAZyme annotations to supplement CAZyme annotations from JGI MycoCosm. |
 | Zoospore_RNA_data_analysis_pt6_Volcano_Plots.py | Additional script for generating volcano plots in the publication. |
 
-### Script Details
-*Part 1: RNA Data Analysis RNAseq Cleanup*
+## Script Details
+### Part 1: RNA Data Analysis RNAseq Cleanup
 Zoospore_RNA_data_analysis_pt1_RNAseq_Cleanup.py
 
-Required Inputs by Script:
+*Required Inputs by Script:*
 1) 'Neosp1_FilteredModels5_deflines_pre.fasta'
 
-FASTA file for genes in Neocallimastix californiae G1 genome,'Neosp1_FilteredModels5_deflines_pre.fasta' downloaded from JGI MycoCosm, under Annotation --> Filtered Models ("best") --> Genes --> "Neosp1_FilteredModels5_deflines.gff.gz" for Project 1029446, 20171122.
+FASTA file for genes in Neocallimastix californiae G1 genome,'Neosp1_FilteredModels5_deflines_pre.fasta' downloaded from JGI MycoCosm, under Annotation &rarr; Filtered Models ("best") &rarr; Genes &rarr; "Neosp1_FilteredModels5_deflines.gff.gz" for Project 1029446, 20171122.
 The FASTA lists gene keys, identified by MycoCosm proteinID, followed by amino acid sequences
 
 2) 'counts_RNAseq_original.txt'
@@ -55,7 +57,7 @@ Note, raw RNA-Seq reads are available at NCBI BioProject: PRJNA982907 to PRJNA98
 
 Transcripts-per-million normalization is considered in this study. 
 
-Outputs to temp_folder:
+*Outputs to temp_folder:*
 
 1) 'Neosp1_FilteredModels5_deflines_post.fasta'
 
@@ -75,20 +77,20 @@ This output is a dictionary describing the proteinIDs with identical amino acid 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-*Part 2: DESeq2 Analysis in R*
+### Part 2: DESeq2 Analysis in R
 R v4.2.2
 Bioconductor v3.16
 DESeq2 v1.36.0
 
-Manually Added Inputs:
+*Manually Added Inputs:*
 1) 'coldata_DESeq2.txt'
 
 DESeq2 Metadata input, describing samples and sample groups
 
-Inputs from Temp Folder (previous script outputs):
+*Inputs from Temp Folder (previous script outputs):*
 1) 'counts_RNAseq_updated.csv'
 
-Outputs to temp_folder:
+*Outputs to temp_folder:*
 1) 'deseq2_output.csv'
 
 DESeq2 output, including log2fold-change and p-value data for each proteinID.
@@ -101,9 +103,9 @@ DESeq2-normazlied counts data with proteinIDs
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-*Part 3: Differential Gene Expression Analysis*
+### Part 3: Differential Gene Expression Analysis
 
-Changeable values:
+*Changeable values:*
 1) mat_samples = list of mat sample names
 
 2) zoosp_samples = list of zoospore sample names
@@ -114,7 +116,7 @@ Changeable values:
 
 5) tpm_cutoff = Transcripts-per-million normalized counts cutoff for describing if a gene is "expressed" or "not expressed." ProteinIDs with TPM values below this cutoff may still be described as expressed, but I implement this cutoff to roughly estimate how many genes for any given gene annotation are likely expressed versus lowly/not expressed. (set value to 1)
 
-Manually Added Inputs:
+*Manually Added Inputs:*
 1) Downloaded JGI MycoCosm Annotations for KOG, GO, IPR, KEGG (file versions generated in 9/18/2017)
 KOG_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_KOG.tsv"
 GO_annot_filename = "Neosp1_GeneCatalog_proteins_20170918_GO.tsv"
@@ -132,7 +134,7 @@ CAZyme_annot_filename = "G1_cazymes_with_dbCAN2.csv"
 Cellulosome-associated proteinIDs:
 cellulosome_annot_filename = "G1_cellulosomes_proteomics.csv"
 
-Inputs from Previous Scripts (deposited in temp folder):
+*Inputs from Previous Scripts (deposited in temp folder):*
 1) DESeq2 Output: "deseq2_output.csv" 
 
 2) DESeq2 Normalized counts: "deseq2_normalized_counts_labeled.csv"
@@ -141,7 +143,7 @@ Inputs from Previous Scripts (deposited in temp folder):
 
 4) RNA-Seq TPM counts (cleaned up): "tpm_counts_RNAseq_updated.csv" 
 
-Outputs to Temp Folder:
+*Outputs to Temp Folder:*
 1) 'DGE_Summary_output_main.xlsx'
 
 (see description under version in Output Folder)
@@ -150,7 +152,7 @@ Outputs to Temp Folder:
 
 In this script, pandas dataframes are generated for the various main annotations. For any given annotation in a main annotation class, the excel data sheets list the proteinIDs in the annotation and the number of those proteinIDs that are classified as "upregulated in zoospores" and "upregulated in mats." 
 
-Outputs to Output Folder:
+*Outputs to Output Folder:*
 1) 'volcano.png'
 
 Volcano plot using (log2FC vs. -log10(padj))
@@ -169,9 +171,9 @@ This output is similar to "DGE_Summary_output_main.xlsx" except that it covers C
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-*Part 4: RNA Data Analysis for Specific Annotations*
+### Part 4: RNA Data Analysis for Specific Annotations
 
-Manually Added Inputs:
+*Manually Added Inputs:*
 1) 'Neosp1_SMs_orthologs.xlsx'
 
 also input for part 3
@@ -198,26 +200,26 @@ This excel contains a list of proteinIDs with unfolded protein response genes an
 - 'TC_ChEBI_IDs.csv'
 - 'TC_superfamily_defs.csv'
 
-Inputs from Previous Scripts (deposited in temp folder):
+*Inputs from Previous Scripts (deposited in temp folder):*
 1) 'DGE_Summary_output_main.xlsx'
 
 from script Part 3
 
-Outputs to Output Folder:
+*Outputs to Output Folder:*
 1) 'DGE_summary_output_formatted.xlsx'
 
 Excel DGE analysis for genes with specific annotations per excel sheet (see input annotations).
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Part 5: RNA Data Analysis for CAZyme and Cellulosome Annotations
+### Part 5: RNA Data Analysis for CAZyme and Cellulosome Annotations
 
-Manually Added Inputs:
+*Manually Added Inputs:*
 1) dbCAN2 CAZyme predictions (multiple parts, with filenames as 'G1_partX_dbCAN_output.xlsx', where X=1 through 6)
 
 These excel sheets were generated by running the CAZyme prediction tool dbCAN2 (https://doi.org/10.1093/nar/gky418).
 
-Inputs from Previous Scripts (deposited in temp folder):
+*Inputs from Previous Scripts (deposited in temp folder):*
 1) 'DGE_Summary_output_main.xlsx'
 
 2) 'cellulosomes_BLASTp_results.csv'
@@ -228,12 +230,12 @@ Inputs from Previous Scripts (deposited in temp folder):
 
 This .csv describes proteomics data results for N. californiae grown in Medium C with reed canary grass. The proteomics data was originally aligned to one set of N. californiae proteinIDs and filtered for proteinIDs with putative cellulosome component function. In order to match with the rest of this data analysis, I performed local BLASTp of the proteinIDs I am considering (listed in 'Neosp1_FilteredModels5_deflines_post.fasta') against the proteinIDs with proteomics data. The resulting analysis aligns the transcriptomic data (zoospore vs. mats) with proteomics data with putative cellulosome component annotations.
 
-Outputs to Output Folder:
+*Outputs to Output Folder:*
 1) 'DGE_summary_dbCAN2_and_cellulosomes.xlsx'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Part 6: Volcano Plot Generation for Publication
+### Part 6: Volcano Plot Generation for Publication
 
 (to be filled in)
 
