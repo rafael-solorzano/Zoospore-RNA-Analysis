@@ -118,6 +118,8 @@ tcdb_blast_filename = "output_TCDB_BLASTp_filtered.csv"
 tcdb_fam_desc_filename = "TC_specific_family_defs.csv"
 tcdb_chebid_filename = "TC_ChEBI_IDs.csv"
 tcdb_superfam_desc_filename = "TC_superfamily_defs.csv"
+# 7) Velvet regulatory proteins
+velvet_annot_filename = "G1_velvet_regulatory_proteins.xlsx"
 
 # Inputs from Previous Scripts (deposited in temp folder)
 # 1) DGE_summary_output from 1st script 
@@ -143,6 +145,8 @@ tcdb_blast = pd.read_csv(pjoin(*[input_folder, tcdb_blast_filename]))
 tcdb_fam_desc = pd.read_csv(pjoin(*[input_folder, tcdb_fam_desc_filename]))
 tcdb_chebid = pd.read_csv(pjoin(*[input_folder, tcdb_chebid_filename]))
 tcdb_superfam_desc = pd.read_csv(pjoin(*[input_folder, tcdb_superfam_desc_filename]))
+
+velvet_annot = pd.read_excel(pjoin(*[input_folder, velvet_annot_filename]), sheet_name='Sheet1')
 
 # Inputs in temp_folder from previous scripts 
 DGE_summary = pd.read_excel(pjoin(*[temp_folder, DGE_summary_filename]), sheet_name='DGE_summary')
@@ -338,6 +342,14 @@ tcdb_blast_filtered = add_to_df(tcdb_blast_filtered, tcdb_superfam_desc, ['TC_su
 # Make a column in tcdb_blast_filtered to describe ChEBI ID. Use add_to_df with tcdb_blast_filtered and tcdb_chebid, using TCID as shared_col
 tcdb_blast_filtered = add_to_df(tcdb_blast_filtered, tcdb_chebid, ['ChEBI_ID_desc'],shared_col='TCID')
 
+"""
+Velvet Regulatory Proteins
+"""
+# filter DGE_summary for velvet regulatory proteins (proteinIDs matching values in list velvet_annot)
+velvet_annot = add_to_df(velvet_annot, DGE_summary, ['log2FC','padj','sig','mat_tpm_avg','zoosp_tpm_avg','mat_upreg','zoosp_upreg', 'proteinID_Ortho_format', 'Orthogroup',	'anasp1_ortholog',	'caecom1_ortholog',	'neosp1_ortholog', 'pirfi3_ortholog', 'S4 orthologs', 'S4 ortholog counts', 'CC orthologs', 'CC ortholog counts', 'G1 orthologs', 'G1 ortholog counts', 'PF orthologs', 'PF ortholog counts'])
+
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Export files
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -363,6 +375,7 @@ SWEET_annot.to_excel(writer, sheet_name='SWEET transporters',index=False)
 TF_annot.to_excel(writer, sheet_name='TFs',index=False)
 UPR_HSR_annot.to_excel(writer, sheet_name='UPR and HSR',index=False)
 tcdb_blast_filtered.to_excel(writer, sheet_name='TCDB Transporters',index=False)
+velvet_annot.to_excel(writer, sheet_name='Velvet Regulatory Proteins',index=False)
 
 """
 Excel conditional formatting
