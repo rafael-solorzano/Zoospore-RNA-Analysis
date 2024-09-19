@@ -40,9 +40,35 @@ def generate_dge_set(df, dir, reg_colname_up, reg_colname_down):
     return dge_set
 
 def generate_volcano_plot(up_df, down_df, ns_df, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size):
+    # Scale the data point size with the TPM count (col name for up: "zoosp_tpm_avg", for down: "mat_tpm_avg")
     plt.scatter(up_df[lfc_colname], -np.log10(up_df[pval_colname]), color='#CD5555', label='Upregulated in Zoospores', s=dp_size, alpha=dp_alpha)
     plt.scatter(down_df[lfc_colname], -np.log10(down_df[pval_colname]), color='#9AC0CD', label='Upregulated in Mats', s=dp_size, alpha=dp_alpha)
     plt.scatter(ns_df[lfc_colname], -np.log10(ns_df[pval_colname]), color='#666666', label='Not Significant', s=dp_size, alpha=dp_alpha)
+
+    plt.axhline(-np.log10(pval_cutoff), color='grey', linestyle='--', dashes=dash_lens)
+    plt.axvline(lfc_cutoff, color='grey', linestyle='--', dashes=dash_lens)
+    plt.axvline(-lfc_cutoff, color='grey', linestyle='--', dashes=dash_lens)
+
+    plt.xlabel('Log2 Fold-Change', fontsize=ax_label_size)
+    plt.ylabel('-Log10(q)', fontsize=ax_label_size)
+
+    plt.xticks(fontsize=ax_tick_size)
+    plt.yticks(fontsize=ax_tick_size)
+    plt.tick_params(axis='both', which='major', length = ax_tick_len, width = ax_tick_width)
+    
+    if legend:
+        plt.legend(fontsize=leg_size, loc="best")
+
+    # Add a title
+    plt.title(title, fontsize=title_size)
+
+    return
+
+def generate_volcano_plot_scale_by_TPM(up_df, down_df, ns_df, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size, tpm_colname_up="zoosp_tpm_avg", tpm_colname_down="mat_tpm_avg"):
+# Scale the data point size with the TPM count (col name for up: "zoosp_tpm_avg", for down: "mat_tpm_avg"). s log(TPM)+10, such that TPM of 1 has s=10, and TPM=16,000 has s=19.68. s type should be int.
+    plt.scatter(up_df[lfc_colname], -np.log10(up_df[pval_colname]), color='#CD5555', label='Upregulated in Zoospores', s=up_df[tpm_colname_up], alpha=dp_alpha)
+    plt.scatter(down_df[lfc_colname], -np.log10(down_df[pval_colname]), color='#9AC0CD', label='Upregulated in Mats', s=down_df[tpm_colname_down], alpha=dp_alpha)
+    plt.scatter(ns_df[lfc_colname], -np.log10(ns_df[pval_colname]), color='#666666', label='Not Significant', s=ns_df[tpm_colname_down], alpha=dp_alpha)  
 
     plt.axhline(-np.log10(pval_cutoff), color='grey', linestyle='--', dashes=dash_lens)
     plt.axvline(lfc_cutoff, color='grey', linestyle='--', dashes=dash_lens)
@@ -90,6 +116,33 @@ def label_points_volcano_plot_proteinIDs_plus_note(reg_df_up, reg_df_down, pval_
     adjust_text(texts,arrowprops=dict(arrowstyle='-', color='black',alpha=0.5, shrinkA=5), force_text=0.1, force_points=0.1, expand_points=(1, 1), expand_text=(1, 1), lim=100)
     return
 
+def label_points_volcano_plot_proteinIDs_scale_by_TPM(reg_df, pval_colname, num_top_points, lfc_colname, tpm_colname):
+    # Filter up_df for the top n most significant genes (by tpm_colname descending value)
+    reg_df = reg_df.sort_values(by=tpm_colname, ascending=False).head(num_top_points)
+
+    texts = []
+    for i,r in reg_df.iterrows():
+        texts.append(plt.text(r[lfc_colname], -np.log10(r[pval_colname]), 'proteinID \n' + str(r['proteinID']), fontsize=20, ha='center', va='center'))
+
+    adjust_text(texts,arrowprops=dict(arrowstyle='-', color='black',alpha=0.5, shrinkA=5), force_text=0.1, force_points=0.1, expand_points=(1, 1), expand_text=(1, 1), lim=100)
+    return
+
+def label_points_volcano_plot_proteinIDs_plus_note_scale_by_TPM(reg_df_up, reg_df_down, pval_colname, num_top_points_up, num_top_points_down, lfc_colname, note_colname, tpm_colname_up, tpm_colname_down):
+    # Filter up_df for the top n most significant genes (by tpm_colname descending value)
+    reg_df_up = reg_df_up.sort_values(by=tpm_colname_up, ascending=False).head(num_top_points_up)
+    reg_df_down = reg_df_down.sort_values(by=tpm_colname_down, ascending=False).head(num_top_points_down)
+
+    texts = []
+    for i,r in reg_df_up.iterrows():
+        texts.append(plt.text(r[lfc_colname], -np.log10(r[pval_colname]), str(r[note_colname] + ' proteinID\n' + str(r['proteinID'])+'\n'), fontsize=20, ha='center', va='center'))
+
+    for i,r in reg_df_down.iterrows():
+        texts.append(plt.text(r[lfc_colname], -np.log10(r[pval_colname]), str(r[note_colname] + ' proteinID\n' + str(r['proteinID'])+'\n'), fontsize=20, ha='center', va='center'))
+
+    # use adjust_text to prevent overlapping text
+    adjust_text(texts,arrowprops=dict(arrowstyle='-', color='black',alpha=0.5, shrinkA=5), force_text=0.1, force_points=0.1, expand_points=(1, 1), expand_text=(1, 1), lim=100)
+    return
+
 def organize_volcano_plot_inputs(dge_df, zoosp_upreg_colname='zoosp_upreg', mat_upreg_colname='mat_upreg',lfc_colname='log2FC', pval_colname='padj', pval_cutoff=0.05, lfc_cutoff=1, dp_size=100, dp_alpha=0.5, ax_label_size=30, ax_tick_size=30, ax_tick_len=10, ax_tick_width=2, dash_lens=[10,10], leg_size=25, legend=True, title="Volcano Plot", title_size=30):
     up_df = generate_dge_set(dge_df, "up", zoosp_upreg_colname, mat_upreg_colname)
     down_df = generate_dge_set(dge_df, "down", zoosp_upreg_colname, mat_upreg_colname)
@@ -97,6 +150,18 @@ def organize_volcano_plot_inputs(dge_df, zoosp_upreg_colname='zoosp_upreg', mat_
     ns_df = generate_dge_set(dge_df, "neither", zoosp_upreg_colname, mat_upreg_colname)
 
     generate_volcano_plot(up_df, down_df, ns_df, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+
+    # Fit the border to the plot
+    plt.tight_layout()
+    return up_df, down_df
+
+def organize_volcano_plot_inputs_scale_by_TPM(dge_df, zoosp_upreg_colname='zoosp_upreg', mat_upreg_colname='mat_upreg',lfc_colname='log2FC', pval_colname='padj', pval_cutoff=0.05, lfc_cutoff=1, dp_size=100, dp_alpha=0.5, ax_label_size=30, ax_tick_size=30, ax_tick_len=10, ax_tick_width=2, dash_lens=[10,10], leg_size=25, legend=True, title="Volcano Plot", title_size=30):
+    up_df = generate_dge_set(dge_df, "up", zoosp_upreg_colname, mat_upreg_colname)
+    down_df = generate_dge_set(dge_df, "down", zoosp_upreg_colname, mat_upreg_colname)
+    # ns = not significant
+    ns_df = generate_dge_set(dge_df, "neither", zoosp_upreg_colname, mat_upreg_colname)
+
+    generate_volcano_plot_scale_by_TPM(up_df, down_df, ns_df, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
 
     # Fit the border to the plot
     plt.tight_layout()
@@ -276,7 +341,7 @@ dpi_val = 1200
 # # *** Remove comments to create volcano Plot ***
 # plot_name = "Volcano_plot_oxidative_stress_genes_" + today + ".png"
 # # Determine the number of top points to label in either direction
-# num_top_points_up = 0
+# num_top_points_up = 8
 # num_top_points_down = 0
 # title = "Oxidative Stress Genes"
 # legend = False
@@ -534,8 +599,8 @@ dpi_val = 1200
 # plt.close()
 # """
 # """
-
-
+# 
+# 
 # """
 # Generate just the legend as output
 # """
@@ -552,6 +617,342 @@ dpi_val = 1200
 # plt.close()
 # """
 # """
+
+
+"""
+"""
+"""
+All Scale by TPM Volcano Plots
+"""
+"""
+"""
+
+""" 
+Transcription Factors Volcano Plot, scale data point size with TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_TFs_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 4
+num_top_points_down = 1
+title = "Transcription Factors"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_tfs, down_tfs = organize_volcano_plot_inputs_scale_by_TPM(dge_tfs, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_tfs, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_tfs, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+Secondary Metabolite Core Genes Volcano Plot, scale data point size with TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_SMs_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 3
+num_top_points_down = 3
+title = "Core Secondary Metabolite Genes"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_sms, down_sms = organize_volcano_plot_inputs_scale_by_TPM(dge_sms, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_plus_note_scale_by_TPM(up_sms, down_sms, pval_colname, num_top_points_up, num_top_points_down, lfc_colname, note_colname='SM_cluster_type', tpm_colname_up="zoosp_tpm_avg", tpm_colname_down="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+Oxidative Stress Genes Volcano Plot, scale data point size with TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_oxidative_stress_genes_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 8
+num_top_points_down = 4
+title = "Oxidative Stress Genes"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_oxid, down_oxid = organize_volcano_plot_inputs_scale_by_TPM(dge_oxid, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_oxid, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_oxid, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+Catabolic CAZymes Volcano Plot, scale data point size with TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_catabolic_cazymes_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 9
+num_top_points_down = 6
+title = "Catabolic CAZymes"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_cat_cazymes, down_cat_cazymes = organize_volcano_plot_inputs_scale_by_TPM(dge_cat_cazymes, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_cat_cazymes, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_cat_cazymes, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+Scaffoldins Volcano Plot, scale data point size with TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_scaffoldins_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 0
+num_top_points_down = 5
+# title = "Proteins with Scaffoldin Domains"
+title = "Scaffoldin-containing Proteins"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_scaffoldins, down_scaffoldins = organize_volcano_plot_inputs_scale_by_TPM(dge_scaffoldins, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_scaffoldins, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_scaffoldins, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+GH48 Volcano Plot with data point size scaled by TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_GH48_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 5
+num_top_points_down = 0
+title = "Glycoside Hydrolase Family 48"
+# title = "GH48"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_gh48, down_gh48 = organize_volcano_plot_inputs_scale_by_TPM(dge_gh48, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_gh48, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_gh48, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+GH1 Volcano Plot with data point size scaled by TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_GH1_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 5
+num_top_points_down = 2
+title = "Glycoside Hydrolase Family 1"
+# title = "GH1"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_gh1, down_gh1 = organize_volcano_plot_inputs_scale_by_TPM(dge_gh1, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_gh1, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_gh1, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+GH3 Volcano Plot with data point size scaled by TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_GH3_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 5
+num_top_points_down = 2
+title = "Glycoside Hydrolase Family 3"
+# title = "GH3"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_gh3, down_gh3 = organize_volcano_plot_inputs_scale_by_TPM(dge_gh3, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_gh3, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_gh3, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+CBM18 Volcano Plot with data point size scaled by TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_CBM18_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 8
+num_top_points_down = 4
+title = "Carbohydrate-binding module family 18"
+# title = "CBM18"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_cbm18, down_cbm18 = organize_volcano_plot_inputs_scale_by_TPM(dge_cbm18, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_cbm18, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_cbm18, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+GT8 Volcano Plot with data point size scaled by TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_GT8_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 0
+num_top_points_down = 6
+title = "Glycosyltransferase Family 8"
+# title = "GT8"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_gt8, down_gt8 = organize_volcano_plot_inputs_scale_by_TPM(dge_gt8, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_gt8, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_gt8, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+Proteins with Dockerin Domain Volcano Plot, scale data point size with TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_dockerin_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 2
+num_top_points_down = 2
+# title = "Proteins with Dockerin Domains"
+title = "Dockerin-containing Proteins"
+legend = False
+
+plt.figure(figsize=(10,10))
+up_dockerin, down_dockerin = organize_volcano_plot_inputs_scale_by_TPM(dge_dockerin, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_dockerin, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_dockerin, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=dpi_val)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+All Genes Volcano Plot, scale data point size with TPM count
+"""
+# *** Remove comments to create volcano Plot ***
+plot_name = "Volcano_plot_all_genes_scale_by_TPM_" + today + ".png"
+# Determine the number of top points to label in either direction
+num_top_points_up = 0
+num_top_points_down = 0
+title = ""
+legend = False
+
+plt.figure(figsize=(10,10))
+up_all, down_all = organize_volcano_plot_inputs_scale_by_TPM(dge_summary, zoosp_upreg_colname, mat_upreg_colname, lfc_colname, pval_colname, pval_cutoff, lfc_cutoff, dp_size, dp_alpha, ax_label_size, ax_tick_size, ax_tick_len, ax_tick_width, dash_lens, leg_size, legend, title, title_size)
+# Label points
+label_points_volcano_plot_proteinIDs_scale_by_TPM(up_all, pval_colname, num_top_points_up, lfc_colname, tpm_colname="zoosp_tpm_avg")
+label_points_volcano_plot_proteinIDs_scale_by_TPM(down_all, pval_colname, num_top_points_down, lfc_colname, tpm_colname="mat_tpm_avg")
+
+# For axis number labels, have only the value for 0, middle point, and max value
+plt.xticks(ticks=[-10, 0, 10, 20])
+plt.yticks(ticks=[0, 50, 100])
+
+# Change axis labels to be larger
+label_size_all_genes = 40
+plt.xlabel('Log2 Fold-Change', fontsize=label_size_all_genes)
+plt.ylabel('-Log10(q)', fontsize=label_size_all_genes)
+plt.xticks(fontsize=label_size_all_genes)
+plt.yticks(fontsize=label_size_all_genes)
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, plot_name]), dpi=1200)
+plt.show()
+plt.close()
+"""
+"""
+
+"""
+Generate just the legend as output. Include a legend for data point size
+"""
+plt.gca().set_axis_off()
+plt.scatter([], [], color='#CD5555', label='Upregulated in Zoospores', s=dp_size, alpha=dp_alpha)
+plt.scatter([], [], color='#9AC0CD', label='Upregulated in Mats', s=dp_size, alpha=dp_alpha)
+plt.scatter([], [], color='#666666', label='Not Significant', s=dp_size, alpha=dp_alpha)
+# Give a legend for the data point size. Have the size range from TPM 1 to 16000
+plt.scatter([], [], color='white', edgecolor='black', label='TPM = 1', s=1, alpha=1)
+plt.scatter([], [], color='white', edgecolor='black', label='TPM = 500', s=500, alpha=1)
+
+
+# Add legend and center it
+plt.legend(fontsize=23, loc="center")
+
+# Save plot in output folder
+plt.savefig(pjoin(*[output_folder, "Volcano_plot_legend_scale_by_TPM_" + today + ".png"]), dpi=dpi_val)
+
+"""
+"""
+
 
 
 """
