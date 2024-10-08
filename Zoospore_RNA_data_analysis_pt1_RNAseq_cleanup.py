@@ -110,6 +110,7 @@ counts_original = pd.read_csv(pjoin(*[input_folder, counts_in_filename]),sep='\t
 # Input RNAseq TPM counts data file as a pandas dataframe. These counts values will be consolidated for proteinIDs with identical amino acid sequences
 tpm_counts_original = pd.read_csv(pjoin(*[input_folder,tpm_counts_in_filename]), sep="\t")
 
+
 """
 Determine proteinIDs with duplicate amino acid sequences
 """
