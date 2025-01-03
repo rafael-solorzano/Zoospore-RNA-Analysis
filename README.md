@@ -237,7 +237,33 @@ This .csv describes proteomics data results for N. californiae grown in Medium C
 
 ### Part 6: Volcano Plot Generation for Publication
 
-(to be filled in)
+
+*Manually Added Inputs:*
+1) Excel for Supplementary Dataset of DGE_summary (see 'Supplementary Dataset DGE_summary draft 2.xlsx')
+
+This excel contains the DGE summary along with additional annotation-specific sheets for transcription factors, scaffoldins, and core secondary metabolite genes.
+
+*Outputs to Output Folder:*
+1) Volcano plots for different annotation categories, generated for:
+- All genes
+- Transcription factors 
+- Core secondary metabolite genes
+- Oxidative stress genes
+- Catabolic CAZymes
+- Scaffoldin-containing proteins
+- Glycoside hydrolase families (GH48, GH1, GH3)
+- Carbohydrate binding module family 18 (CBM18)
+- Glycosyltransferase family 8 (GT8)
+- Dockerin-containing proteins
+
+2) Upset plot showing overlap between:
+- L-arabinose isomerase (KEGG)
+- Predicted transporter MFS (KOG)
+- Sugar transporter (InterPro) 
+- Carbohydrate transporter (GO)
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 
 ## Support
 For support with using these scripts, please contact lbutkovich@ucsb.edu.
