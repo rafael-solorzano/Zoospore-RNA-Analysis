@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pylab as plt
+import matplotlib
+matplotlib.use("TkAgg")
 import seaborn as sns
 import numpy as np
 from os.path import join as pjoin
